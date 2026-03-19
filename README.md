@@ -52,7 +52,7 @@ UPI credit. Worker notified instantly.
 
 ---
 
-## 5. Weekly Premium Model
+## 3. Weekly Premium Model
 
 ### Earning DNA Engine
 A regression model (scikit-learn) estimates a worker's anticipated pay depending on:
@@ -76,10 +76,10 @@ The formula for payouts is the worker's earnings DNA (for that day) times the di
 | **40%** | Platform down > 60% drop · 90 minutes or more |
 | **70%** | Curfew or civil unrest |
 
-* Flood Shield Boost: When there is a flood alarm, the weekly payout limit goes up by 50%. For example, Shield Plus ₹1,500 becomes ₹2,250).
+* Flood Shield Boost: When there is a flood alarm, the weekly payout limit goes up by 50%. For example, Shield Plus ₹1,500 becomes ₹2,250.
 ---
 
-## 6. Parametric Triggers
+## 4. Parametric Triggers
 Triggers are evaluated at **pincode level In 3km radius**, not city-wide.
 
 **Layer 1 — Environmental**
@@ -93,7 +93,7 @@ Triggers are evaluated at **pincode level In 3km radius**, not city-wide.
 
 ---
 
-## 7. AI/ML Integration
+## 5. AI/ML Integration
 
 ### Earning DNA Engine
 A regression model trained on each worker's 8-week delivery history. 
@@ -116,7 +116,7 @@ Claude API-powered assistant handles worker queries in plain language policy det
 
 ---
 
-## 8. Adversarial Defense & Anti-Spoofing Strategy.
+## 6. Adversarial Defense & Anti-Spoofing Strategy.
 
 > *"You can spoof your GPS. You cannot spoof a photo, your footsteps, the sound of rain outside your window, or the referral chain that brought you here."*
 
@@ -170,7 +170,7 @@ Claims flow into one of three lanes — never a binary block:
 
 ---
 
-## 9. Platform Justification
+## 7. Platform Justification
 
 **Choice: Mobile-first Progressive Web App (PWA) for workers + Web dashboard for operations**
 
@@ -181,7 +181,7 @@ Claims flow into one of three lanes — never a binary block:
 
 ---
 
-## 10. Tech Stack
+## 8. Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -199,7 +199,7 @@ Claims flow into one of three lanes — never a binary block:
 
 ---
 
-## 11. Development Plan
+## 9. Development Plan
 
 | Week | Focus | Key Deliverables |
 |---|---|---|
@@ -221,4 +221,4 @@ The result: a delivery partner opens the app after a rain-soaked morning off, an
 ---
 
 *Clad: Always covered. No matter what.*
-**Team · Guidewire DEVTrails 2026**
+**4AM_Club · Guidewire DEVTrails 2026**
