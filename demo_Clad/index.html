@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clad — Always Covered</title>
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Cabinet Grotesk',sans-serif}
+
+/* ── VIEWS ── */
+.view{display:none;width:100%;min-height:100vh}
+.view.active{display:block}
+
+/* ══════════════════════════════════════════════
+   LANDING PAGE
+══════════════════════════════════════════════ */
+#view-landing{background:#0D0D0B;color:#F0EDE6;overflow-x:hidden}
+
+/* NAV */
+.lnav{display:flex;justify-content:space-between;align-items:center;padding:20px 48px;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;background:rgba(13,13,11,0.92);backdrop-filter:blur(20px);z-index:100}
+.lnav-logo{font-family:'Fraunces',serif;font-size:24px;font-weight:900;letter-spacing:-0.02em;color:#F0EDE6}
+.lnav-links{display:flex;gap:24px;align-items:center}
+.lnav-links a{color:rgba(240,237,230,0.45);text-decoration:none;font-size:14px;font-weight:500;cursor:pointer;transition:color 0.2s}
+.lnav-links a:hover{color:#F0EDE6}
+.lnav-cta{background:#F0EDE6!important;color:#0D0D0B!important;padding:10px 20px;border-radius:10px;font-weight:700!important;font-size:14px;text-decoration:none;transition:opacity 0.2s;cursor:pointer}
+.lnav-cta:hover{opacity:0.9}
+
+/* HERO */
+.hero{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,230,118,0.06),transparent);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);color:#00E676;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:32px}
+.badge-dot{width:6px;height:6px;border-radius:3px;background:#00E676;animation:ldot 2s ease-in-out infinite}
+@keyframes ldot{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(48px,8vw,96px);font-weight:900;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;color:#F0EDE6}
+.hero h1 span{color:#00E676}
+.hero-sub{font-size:18px;color:rgba(240,237,230,0.45);max-width:520px;line-height:1.7;margin-bottom:48px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.hbtn-p{background:#F0EDE6;color:#0D0D0B;padding:16px 32px;border-radius:14px;font-weight:700;font-size:16px;border:none;cursor:pointer;transition:transform 0.15s,opacity 0.15s;font-family:'Cabinet Grotesk',sans-serif}
+.hbtn-p:hover{transform:translateY(-2px)}
+.hbtn-o{border:1px solid rgba(255,255,255,0.08);color:#F0EDE6;padding:16px 32px;border-radius:14px;font-weight:600;font-size:16px;background:transparent;cursor:pointer;transition:background 0.2s;font-family:'Cabinet Grotesk',sans-serif}
+.hbtn-o:hover{background:#161614}
+
+/* STATS */
+.lstats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
+.lstat{background:#0D0D0B;padding:40px 32px;text-align:center}
+.lstat-val{font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:#F0EDE6;line-height:1}
+.lstat-lbl{font-size:13px;color:rgba(240,237,230,0.45);margin-top:6px}
+
+/* SECTIONS */
+.lsec{padding:100px 48px;max-width:1200px;margin:0 auto}
+.lsec-label{font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#00E676;margin-bottom:16px}
+.lsec-title{font-family:'Fraunces',serif;font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1.1;letter-spacing:-0.02em;margin-bottom:16px;color:#F0EDE6}
+.lsec-sub{font-size:16px;color:rgba(240,237,230,0.45);max-width:500px;line-height:1.7;margin-bottom:60px}
+
+/* HOW IT WORKS STEPS */
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,0.08);border-radius:20px;overflow:hidden}
+.how-step{background:#161614;padding:32px 28px}
+.how-num{font-family:'Fraunces',serif;font-size:48px;font-weight:900;color:rgba(255,255,255,0.08);margin-bottom:16px;line-height:1}
+.how-title{font-size:16px;font-weight:700;color:#F0EDE6;margin-bottom:8px}
+.how-desc{font-size:13px;color:rgba(240,237,230,0.45);line-height:1.6}
+
+/* TRIGGERS */
+.trig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.trig-card{background:#161614;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;transition:border-color 0.2s}
+.trig-card:hover{border-color:rgba(0,230,118,0.3)}
+.trig-icon{font-size:28px;margin-bottom:12px}
+.trig-name{font-size:15px;font-weight:700;color:#F0EDE6;margin-bottom:4px}
+.trig-thresh{font-size:12px;color:rgba(240,237,230,0.45);margin-bottom:12px}
+.trig-rate{display:inline-block;background:rgba(0,230,118,0.1);color:#00E676;font-size:13px;font-weight:700;padding:4px 10px;border-radius:8px}
+
+/* DEMO SECTION */
+.demo-sec{padding:100px 48px;background:#161614;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08)}
+.demo-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.demo-cards{display:flex;gap:16px;justify-content:center;align-items:flex-start;padding-top:32px}
+.demo-card{width:180px;height:320px;background:#0D0D0B;border-radius:28px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.demo-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,0.4)}
+.demo-card-lbl{font-size:11px;font-weight:600;color:rgba(240,237,230,0.4);text-align:center;padding:0 16px;margin-top:4px}
+.demo-card-badge{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:10px;font-weight:600;color:rgba(240,237,230,0.4)}
+
+/* FRAUD GRID */
+.fraud-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fraud-card{background:#161614;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px}
+.fraud-layer{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:8px}
+.fl1{background:rgba(68,138,255,0.12);color:#4A9EFF}
+.fl2{background:rgba(248,113,113,0.12);color:#F87171}
+.fl3{background:rgba(0,230,118,0.1);color:#00E676}
+.fraud-title{font-size:14px;font-weight:700;color:#F0EDE6;margin-bottom:6px}
+.fraud-desc{font-size:12px;color:rgba(240,237,230,0.45);line-height:1.6}
+
+/* FOOTER */
+.lfooter{padding:48px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.lfooter-logo{font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:#F0EDE6}
+.lfooter-txt{font-size:13px;color:rgba(240,237,230,0.45)}
+
+/* ══════════════════════════════════════════════
+   WORKER APP (PHONE MODAL)
+══════════════════════════════════════════════ */
+#view-app{
+  background:#050505;display:none;align-items:center;justify-content:center;
+  min-height:100vh;position:fixed;inset:0;z-index:200;
+  flex-direction:column;gap:16px;
+}
+#view-app.active{display:flex}
+
+.app-close{
+  position:fixed;top:20px;right:20px;z-index:300;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
+  color:#F2EFE8;width:40px;height:40px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;cursor:pointer;font-size:18px;
+  transition:background 0.2s;backdrop-filter:blur(10px)
+}
+.app-close:hover{background:rgba(255,255,255,0.2)}
+
+/* Phone shell */
+:root{
+  --bg:#080808;--s1:#111110;--s2:#1a1a18;--s3:#242422;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --t1:#F2EFE8;--t2:rgba(242,239,232,0.55);--t3:rgba(242,239,232,0.28);
+  --green:#00E676;--gd:rgba(0,230,118,0.10);--gb:rgba(0,230,118,0.22);
+  --amber:#FFB300;--ad:rgba(255,179,0,0.10);
+  --red:#FF5252;--rd:rgba(255,82,82,0.10);
+  --blue:#448AFF;--bd:rgba(68,138,255,0.10);
+}
+.shell{
+  width:min(390px,95vw);height:min(844px,90vh);
+  background:var(--bg);border-radius:clamp(0px,5vw,52px);
+  overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.08),0 40px 100px rgba(0,0,0,0.8),0 0 80px rgba(0,230,118,0.03)
+}
+.shell::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:99;opacity:.4}
+.ascreen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;background:var(--bg);opacity:0;transform:translateX(30px);transition:opacity .32s cubic-bezier(.16,1,.3,1),transform .32s cubic-bezier(.16,1,.3,1)}
+.ascreen::-webkit-scrollbar{display:none}
+.ascreen.active{opacity:1;transform:translateX(0)}
+.ascreen.exit{opacity:0;transform:translateX(-30px);pointer-events:none}
+
+/* App shared styles */
+.glow-green{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,0.12),transparent 70%);pointer-events:none;filter:blur(40px)}
+.glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:24px}
+.abtn{width:100%;padding:17px;border:none;border-radius:16px;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:-.01em;transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+.abtn:active{transform:scale(.97)}
+.abtn-green{background:linear-gradient(135deg,#00E676,#00C853);color:#080808;box-shadow:0 8px 32px rgba(0,230,118,0.3)}
+.abtn-white{background:var(--t1);color:#080808;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.abtn-ghost{background:transparent;border:1px solid var(--b2);color:var(--t2)}
+.ainp{width:100%;padding:16px 18px;background:var(--s2);border:1.5px solid var(--b1);border-radius:14px;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:500;color:var(--t1);outline:none;transition:border-color .2s;-webkit-appearance:none}
+.ainp:focus{border-color:var(--green);background:var(--s3)}
+.ainp::placeholder{color:var(--t3)}
+.albl{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:block}
+.atag-green{background:var(--gd);color:var(--green);border:1px solid var(--gb);display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700}
+.atag-dim{background:var(--s2);color:var(--t2);border:1px solid var(--b1);display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700}
+.adot{width:7px;height:7px;border-radius:3px;background:var(--b2);transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.adot.on{background:var(--green);width:20px;box-shadow:0 0 8px var(--green)}
+.apbar{height:3px;background:var(--b1);border-radius:2px;overflow:hidden}
+.apfill{height:100%;border-radius:2px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.aplan{border-radius:20px;padding:20px;cursor:pointer;border:1.5px solid var(--b1);transition:transform .2s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;position:relative;overflow:hidden;background:var(--s1)}
+.aplan.sel-green{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset,0 8px 32px rgba(0,230,118,.15);background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,230,118,.02))}
+.aplan.sel-amber{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset,0 8px 32px rgba(255,179,0,.15)}
+.aplan.sel-blue{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset,0 8px 32px rgba(68,138,255,.15)}
+.azone{padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:12px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);text-align:center}
+.azone.on{background:var(--gd);border-color:var(--green);color:var(--green)}
+.achk{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b1)}
+.achk:last-child{border-bottom:none}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:16px 28px 8px;font-size:12px;font-weight:700;color:var(--t2);position:sticky;top:0;z-index:10;background:linear-gradient(to bottom,var(--bg) 70%,transparent)}
+.bnav{position:sticky;bottom:0;background:rgba(8,8,8,0.92);backdrop-filter:blur(30px);border-top:1px solid var(--b1);display:grid;grid-template-columns:1fr 1fr 1fr;padding:12px 0 28px;z-index:20}
+.bni{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.bni:active{transform:scale(.9)}
+.bni-icon{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .2s}
+.bni.on .bni-icon{background:var(--gd)}
+.bni-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase}
+.bni.on .bni-lbl{color:var(--green)}
+.serif{font-family:'Instrument Serif',serif}
+.display{font-family:'Instrument Serif',serif;font-style:italic}
+
+/* App animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleSpring{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(0,230,118,.3)}50%{box-shadow:0 0 40px rgba(0,230,118,.6),0 0 80px rgba(0,230,118,.2)}}
+@keyframes checkDraw{from{stroke-dashoffset:55}to{stroke-dashoffset:0}}
+@keyframes ringFill{from{stroke-dashoffset:251}to{stroke-dashoffset:var(--end)}}
+@keyframes arain{0%{transform:translateY(-10px);opacity:0}15%{opacity:.8}85%{opacity:.8}100%{transform:translateY(40px);opacity:0}}
+@keyframes countUp{from{opacity:0;transform:translateY(10px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes alertRing{0%{box-shadow:0 0 0 0 rgba(255,179,0,.5)}70%{box-shadow:0 0 0 16px rgba(255,179,0,0)}100%{box-shadow:0 0 0 0 rgba(255,179,0,0)}}
+@keyframes slideInRow{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+.fu1{animation:fadeUp .4s .05s cubic-bezier(.16,1,.3,1) both}
+.fu2{animation:fadeUp .4s .12s cubic-bezier(.16,1,.3,1) both}
+.fu3{animation:fadeUp .4s .19s cubic-bezier(.16,1,.3,1) both}
+.fu4{animation:fadeUp .4s .26s cubic-bezier(.16,1,.3,1) both}
+.fu5{animation:fadeUp .4s .33s cubic-bezier(.16,1,.3,1) both}
+.fu6{animation:fadeUp .4s .40s cubic-bezier(.16,1,.3,1) both}
+.ring-progress{stroke-dasharray:251;stroke-dashoffset:251;animation:ringFill 1.2s cubic-bezier(.34,1.56,.64,1) .4s forwards;transform:rotate(-90deg);transform-origin:50px 50px}
+.check-path{stroke-dasharray:55;stroke-dashoffset:55;animation:checkDraw .45s cubic-bezier(.16,1,.3,1) .3s forwards}
+
+/* ══════════════════════════════════════════════
+   OPS DASHBOARD (FULLSCREEN MODAL)
+══════════════════════════════════════════════ */
+#view-dash{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:#0D0D0B;overflow-y:auto;
+}
+#view-dash.active{display:block}
+.dash-close{position:fixed;top:16px;right:20px;z-index:300;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#F0EDE6;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background 0.2s}
+.dash-close:hover{background:rgba(255,255,255,0.15)}
+
+/* Dashboard styles */
+.dlayout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.dsidebar{background:#131310;border-right:1px solid rgba(255,255,255,0.07);position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.dsb-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.dsb-logo-t{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:#E8E4DC}
+.dsb-logo-s{font-size:11px;color:rgba(232,228,220,0.4);margin-top:2px}
+.dsb-nav{padding:16px 10px;flex:1}
+.dsb-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(232,228,220,0.2);padding:0 10px;margin-bottom:6px;margin-top:14px}
+.dsb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-size:14px;font-weight:500;color:rgba(232,228,220,0.45);cursor:pointer;transition:all .15s;margin-bottom:2px}
+.dsb-item:hover{background:#1A1A16;color:#E8E4DC}
+.dsb-item.on{background:#1A1A16;color:#E8E4DC}
+.dsb-badge{margin-left:auto;background:#FF5252;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px}
+.dsb-foot{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px;color:rgba(232,228,220,0.2)}
+.dmain{overflow-y:auto;background:#0D0D0B}
+.dtopbar{display:flex;justify-content:space-between;align-items:center;padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:rgba(13,13,11,0.95);z-index:10;backdrop-filter:blur(10px)}
+.dtopbar h1{font-size:20px;font-weight:700;color:#E8E4DC}
+.dtopbar p{font-size:12px;color:rgba(232,228,220,0.45);margin-top:2px}
+.dlive{display:flex;align-items:center;gap:7px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);padding:7px 12px;border-radius:9px;font-size:12px;font-weight:600;color:#00E676}
+.dldot{width:7px;height:7px;border-radius:4px;background:#00E676;animation:ldot 1.5s ease-in-out infinite}
+.dcontent{padding:24px 28px}
+.dcard{background:#131310;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px}
+.dcard-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.dcard-title{font-size:13px;font-weight:700;color:#E8E4DC}
+.dcard-act{font-size:11px;color:rgba(232,228,220,0.45);cursor:pointer}
+.dmetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.dmetric{background:#131310;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px}
+.dm-lbl{font-size:11px;color:rgba(232,228,220,0.45);margin-bottom:8px}
+.dm-val{font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:#E8E4DC;line-height:1}
+.dm-sub{font-size:11px;margin-top:4px}
+.dg2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.dtbl{width:100%;border-collapse:collapse;font-size:13px}
+.dtbl th{text-align:left;font-size:11px;font-weight:600;color:rgba(232,228,220,0.45);padding:0 0 10px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.dtbl td{padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.07);color:#E8E4DC;vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:600}
+.db-green{background:rgba(0,230,118,0.1);color:#00E676}
+.db-amber{background:rgba(245,158,11,0.1);color:#F59E0B}
+.db-red{background:rgba(239,68,68,0.1);color:#EF4444}
+.db-blue{background:rgba(96,165,250,0.1);color:#60A5FA}
+.dprog{height:6px;background:#1A1A16;border-radius:3px;overflow:hidden;margin-top:6px}
+.dpfill{height:100%;border-radius:3px;transition:width .8s ease}
+.zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.zone-cell{background:#1A1A16;border-radius:10px;padding:12px 10px;border:1px solid rgba(255,255,255,0.07);cursor:pointer;transition:all .2s;position:relative}
+.zone-cell.critical{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+.zone-cell.watch{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+.zone-name{font-size:12px;font-weight:600;color:#E8E4DC}
+.zone-cnt{font-size:11px;color:rgba(232,228,220,0.45);margin-top:2px}
+.zdot{width:8px;height:8px;border-radius:4px;position:absolute;top:10px;right:10px}
+.lane-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:11px;margin-bottom:8px}
+.lane-g{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2)}
+.lane-a{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2)}
+.lane-r{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2)}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 0 4px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.bar-lbl{font-size:10px;color:rgba(232,228,220,0.3)}
+.bar-val{font-size:10px;color:rgba(232,228,220,0.5);font-weight:600}
+.dmain::-webkit-scrollbar{width:4px}
+.dmain::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:2px}
+
+@media(max-width:900px){
+  .dlayout{grid-template-columns:1fr}
+  .dsidebar{display:none}
+  .dmetrics{grid-template-columns:1fr 1fr}
+  .dg2{grid-template-columns:1fr}
+  .fraud-grid{grid-template-columns:1fr}
+  .lstats{grid-template-columns:1fr 1fr}
+  .lsec{padding:60px 20px}
+  .how-steps{grid-template-columns:1fr 1fr}
+  .trig-grid{grid-template-columns:1fr 1fr}
+  .demo-inner{grid-template-columns:1fr}
+  .lnav{padding:16px 20px}
+  .lnav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════ -->
+<div id="view-landing" class="view active">
+  <nav class="lnav">
+    <div class="lnav-logo">Clad</div>
+    <div class="lnav-links">
+      <a onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</a>
+      <a onclick="document.getElementById('triggers').scrollIntoView({behavior:'smooth'})">Triggers</a>
+      <a onclick="document.getElementById('fraud').scrollIntoView({behavior:'smooth'})">Fraud defense</a>
+      <a class="lnav-cta" onclick="openApp()">Worker App →</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge"><span class="badge-dot"></span>Guidewire DEVTrails 2026 · Phase 1 · 4AM Club</div>
+    <h1>Always<br/><span>covered.</span><br/>No matter what.</h1>
+    <p class="hero-sub">AI-powered parametric income insurance for Q-commerce delivery partners. When disruptions hit — your UPI gets paid. Automatically.</p>
+    <div class="hero-btns">
+      <button class="hbtn-p" onclick="openApp()">Worker App Demo →</button>
+      <button class="hbtn-o" onclick="openDash()">Ops Dashboard →</button>
+    </div>
+  </div>
+
+  <div class="lstats">
+    <div class="lstat"><div class="lstat-val">₹0</div><div class="lstat-lbl">Forms to fill</div></div>
+    <div class="lstat"><div class="lstat-val">2hr</div><div class="lstat-lbl">Max payout time</div></div>
+    <div class="lstat"><div class="lstat-val">3km</div><div class="lstat-lbl">Pincode precision</div></div>
+    <div class="lstat"><div class="lstat-val">15</div><div class="lstat-lbl">Fraud signals</div></div>
+  </div>
+
+  <div class="lsec" id="how">
+    <div class="lsec-label">How it works</div>
+    <div class="lsec-title">From disruption to<br/>payout in 2 hours.</div>
+    <div class="lsec-sub">No claim forms. No agents. A pre-agreed trigger fires and money lands on the worker's UPI automatically.</div>
+    <div class="how-steps">
+      <div class="how-step"><div class="how-num">01</div><div class="how-title">Worker signs up</div><div class="how-desc">2-minute onboarding. PAN verification + home zone pincode. AI builds Earning DNA from 8-week delivery history.</div></div>
+      <div class="how-step"><div class="how-num">02</div><div class="how-title">Trigger detected</div><div class="how-desc">Real-time monitoring of weather, AQI, civic alerts, and platform signals — all evaluated at 3km pincode radius.</div></div>
+      <div class="how-step"><div class="how-num">03</div><div class="how-title">Fraud engine runs</div><div class="how-desc">15 independent signals check the claim in under 3 seconds. GPS variance, accelerometer, cell tower, biometrics.</div></div>
+      <div class="how-step"><div class="how-num">04</div><div class="how-title">UPI credited</div><div class="how-desc">Payout hits the worker's UPI automatically. Based on their personal Earning DNA — not a flat industry average.</div></div>
+    </div>
+  </div>
+
+  <div class="lsec" id="triggers" style="padding-top:0">
+    <div class="lsec-label">3-Layer trigger stack</div>
+    <div class="lsec-title">We cover what no one else does.</div>
+    <div class="lsec-sub">Weather. Civic disruptions. Platform outages. The third layer is exclusive to Clad.</div>
+    <div class="trig-grid">
+      <div class="trig-card"><div class="trig-icon">🌧️</div><div class="trig-name">Heavy rain</div><div class="trig-thresh">> 7.5mm/hr for 45+ minutes</div><div class="trig-rate">60% payout</div></div>
+      <div class="trig-card"><div class="trig-icon">🌡️</div><div class="trig-name">Extreme heat</div><div class="trig-thresh">> 42°C between 11am–4pm</div><div class="trig-rate">40% payout</div></div>
+      <div class="trig-card"><div class="trig-icon">😷</div><div class="trig-name">Toxic AQI</div><div class="trig-thresh">> 300 for 3+ hours</div><div class="trig-rate">50% payout</div></div>
+      <div class="trig-card"><div class="trig-icon">🌊</div><div class="trig-name">Flood alert</div><div class="trig-thresh">Zone flood alert active</div><div class="trig-rate">80% payout</div></div>
+      <div class="trig-card" style="border-color:rgba(0,230,118,0.3)"><div class="trig-icon">📉</div><div class="trig-name">App outage <span style="color:#00E676;font-size:11px">★ Exclusive</span></div><div class="trig-thresh">Order volume drops 60%+ for 90+ min</div><div class="trig-rate">40% payout</div></div>
+      <div class="trig-card"><div class="trig-icon">🚧</div><div class="trig-name">Curfew / Bandh</div><div class="trig-thresh">Civic alert in worker's zone</div><div class="trig-rate">70% payout</div></div>
+    </div>
+  </div>
+
+  <div class="demo-sec">
+    <div class="demo-inner">
+      <div>
+        <div class="lsec-label">Live demo</div>
+        <div class="lsec-title" style="margin-bottom:16px">See Ravi get paid.</div>
+        <p style="font-size:16px;color:rgba(240,237,230,0.45);line-height:1.7;margin-bottom:32px">It's raining in Koramangala. Ravi can't work. Before the rain stops, ₹420 is already in his UPI. No claim filed. No agent called. Just covered.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <button class="hbtn-p" onclick="openApp()" style="text-align:center">Open Worker App →</button>
+          <button class="hbtn-o" onclick="openDash()" style="text-align:center">Open Ops Dashboard →</button>
+        </div>
+      </div>
+      <div class="demo-cards">
+        <div class="demo-card" onclick="openApp()" style="margin-top:32px">
+          <div style="font-family:'Fraunces',serif;font-size:28px;color:#F0EDE6;font-weight:900">Clad</div>
+          <div class="demo-card-lbl">Worker App</div>
+          <div style="font-size:11px;color:rgba(240,237,230,0.3);margin-top:4px">Tap to open</div>
+        </div>
+        <div class="demo-card" onclick="openDash()">
+          <div style="font-size:28px">📊</div>
+          <div class="demo-card-lbl">Ops Dashboard</div>
+          <div style="font-size:11px;color:rgba(240,237,230,0.3);margin-top:4px">Tap to open</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lsec" id="fraud">
+    <div class="lsec-label">Adversarial defense</div>
+    <div class="lsec-title">15 signals. 3 layers.<br/>No GPS spoofer gets through.</div>
+    <div class="lsec-sub">A fraud ring of 500 GPS-spoofed accounts just drained a competitor. Clad fights back at every layer.</div>
+    <div class="fraud-grid">
+      <div class="fraud-card"><span class="fraud-layer fl1">Layer 1 — Individual</span><div class="fraud-title">GPS Variance Analysis</div><div class="fraud-desc">Spoofed GPS holds a static coordinate. Real phones show 3–8m natural jitter. Static within ±0.5m for 40+ min = impossible on real hardware.</div></div>
+      <div class="fraud-card"><span class="fraud-layer fl1">Layer 1 — Individual</span><div class="fraud-title">Accelerometer Cross-Check</div><div class="fraud-desc">Fake GPS can't spoof the accelerometer. A fraudster making deliveries shows walking cadence (1.8–2.2 Hz) contradicting their "stationary" GPS.</div></div>
+      <div class="fraud-card"><span class="fraud-layer fl1">Layer 1 — Individual</span><div class="fraud-title">Behavioral Biometrics</div><div class="fraud-desc">30-day fingerprint of tap pressure, scroll velocity, phone tilt. A ring operator using 10 fake accounts on one device triggers all 10.</div></div>
+      <div class="fraud-card"><span class="fraud-layer fl1">Layer 1 — Individual</span><div class="fraud-title">Delivery History Gate + PAN</div><div class="fraud-desc">Real workers have 8+ weeks of history. PAN verification means a ring can't batch-create 500 accounts. No history = no payout eligibility.</div></div>
+      <div class="fraud-card"><span class="fraud-layer fl2">Layer 2 — Network</span><div class="fraud-title">Claim Timestamp Clustering</div><div class="fraud-desc">Real workers file over 90–120 min. Fraud rings script all 500 in 3–5 min. 50+ claims from same pincode in 5 min → batch held.</div></div>
+      <div class="fraud-card"><span class="fraud-layer fl2">Layer 2 — Network</span><div class="fraud-title">Patient Zero Unwinding</div><div class="fraud-desc">Fraud clusters trace back to a referral root. Every account within 2 degrees of Patient Zero enters permanent red lane. Ring unwound retroactively.</div></div>
+      <div class="fraud-card"><span class="fraud-layer fl2">Layer 2 — Network</span><div class="fraud-title">Honeypot Ghost Zones</div><div class="fraud-desc">2–3 ghost pincodes appear valid when probed but have zero real workers. First claim from a ghost zone → entire ring exposed and frozen.</div></div>
+      <div class="fraud-card" style="grid-column:1/-1"><span class="fraud-layer fl3">Layer 3 — UX Protection</span><div class="fraud-title">Tiered Lane Routing — Honest Workers Never Blocked</div><div class="fraud-desc">Claims route to 🟢 Green (auto 2hr), 🟡 Yellow (6hr → auto), or 🔴 Red (24hr review). False positives add a Shield note — never counted against the worker. Network drops in bad weather get 20% signal tolerance. Real disruptions confirmed by 40+ zone neighbours.</div></div>
+    </div>
+  </div>
+
+  <footer class="lfooter">
+    <div class="lfooter-logo">Clad</div>
+    <div class="lfooter-txt">Always covered. No matter what.</div>
+    <div class="lfooter-txt">4AM Club · Guidewire DEVTrails 2026 · Phase 1</div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════════
+     WORKER APP (PHONE MODAL)
+══════════════════════════════════════════ -->
+<div id="view-app">
+  <div class="app-close" onclick="closeApp()">✕</div>
+  <div class="shell" id="app-root"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     OPS DASHBOARD
+══════════════════════════════════════════ -->
+<div id="view-dash">
+  <div class="dash-close" onclick="closeDash()">✕</div>
+  <div class="dlayout">
+    <div class="dsidebar">
+      <div class="dsb-logo"><div class="dsb-logo-t">Clad</div><div class="dsb-logo-s">Operations Dashboard</div></div>
+      <div class="dsb-nav">
+        <div class="dsb-lbl">Overview</div>
+        <div class="dsb-item on" onclick="showDView('overview')"><span>◈</span>Overview</div>
+        <div class="dsb-item" onclick="showDView('triggers')"><span>⚡</span>Live Triggers</div>
+        <div class="dsb-item" onclick="showDView('claims')"><span>◎</span>Claims<span class="dsb-badge">3</span></div>
+        <div class="dsb-lbl">Intelligence</div>
+        <div class="dsb-item" onclick="showDView('fraud')"><span>🛡</span>Fraud Engine<span class="dsb-badge" style="background:#F59E0B">2</span></div>
+        <div class="dsb-item" onclick="showDView('workers')"><span>◉</span>Workers</div>
+        <div class="dsb-lbl">Finance</div>
+        <div class="dsb-item" onclick="showDView('payouts')"><span>₹</span>Payouts</div>
+      </div>
+      <div class="dsb-foot">Guidewire DEVTrails 2026<br/>Phase 1 · Clad v0.1 · 4AM Club</div>
+    </div>
+    <div class="dmain" id="dmain">
+      <div class="dtopbar">
+        <div><h1 id="dash-title">Overview</h1><p>Bengaluru · Live · March 20, 2026</p></div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="dlive"><div class="dldot"></div>Live</div>
+          <button onclick="closeDash()" style="color:rgba(232,228,220,0.45);font-size:13px;background:transparent;border:1px solid rgba(255,255,255,0.07);padding:7px 12px;border-radius:9px;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif">← Landing</button>
+        </div>
+      </div>
+      <div class="dcontent" id="dcontent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════ VIEW SWITCHING ══════════
+function openApp(){
+  document.getElementById('view-app').classList.add('active');
+  document.body.style.overflow='hidden';
+  if(!appBooted){bootApp();appBooted=true;}
+}
+function closeApp(){
+  document.getElementById('view-app').classList.remove('active');
+  document.body.style.overflow='';
+}
+function openDash(){
+  document.getElementById('view-dash').classList.add('active');
+  document.body.style.overflow='hidden';
+  showDView('overview');
+}
+function closeDash(){
+  document.getElementById('view-dash').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+// ══════════ WORKER APP ══════════
+let appBooted=false,curEl=null;
+const AR=document.getElementById('app-root');
+
+function ago(name){
+  if(curEl){curEl.classList.remove('active');curEl.classList.add('exit');const d=curEl;setTimeout(()=>d.remove(),350);}
+  const el=ASCREENS[name]?.();if(!el)return;
+  AR.appendChild(el);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));
+  curEl=el;
+}
+function atab(t){ago({home:'ahome',policy:'apolicy',profile:'aprofile'}[t]||'ahome');}
+function anow(){const d=new Date();return`${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function asbar(){return`<div class="sbar"><span>${anow()}</span><span style="font-size:11px">●●●● WiFi 🔋</span></div>`;}
+function abnav(a){
+  const items=[{id:'home',svg:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,l:'Home'},{id:'policy',svg:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,l:'Policy'},{id:'profile',svg:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,l:'You'}];
+  return`<div class="bnav">${items.map(i=>`<div class="bni${i.id===a?' on':''}" onclick="atab('${i.id}')"><div class="bni-icon" style="color:${i.id===a?'var(--green)':'var(--t3)'}">${i.svg}</div><div class="bni-lbl">${i.l}</div></div>`).join('')}</div>`;
+}
+function bootApp(){ago('asplash');}
+
+const ASCREENS={
+asplash(){
+  const el=document.createElement('div');el.className='ascreen';
+  el.style.cssText='background:linear-gradient(160deg,#080808 0%,#0d1208 50%,#080808 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0';
+  el.innerHTML=`<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><div class="glow-green" style="top:-50px;left:-80px;opacity:.7"></div><div class="glow-green" style="bottom:100px;right:-60px;opacity:.4;width:200px;height:200px"></div></div><div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px"><div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;animation:glowPulse 2s ease-in-out infinite"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" fill="rgba(0,230,118,.3)" stroke="var(--green)" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="display fu1" style="font-size:52px;color:var(--t1);letter-spacing:-.02em;line-height:1">Clad</div><div class="fu2" style="font-size:13px;color:var(--t3);letter-spacing:.2em;text-transform:uppercase;font-weight:600">Always Covered</div><div class="fu3" style="width:48px;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent);border-radius:2px;margin-top:8px"></div></div>`;
+  setTimeout(()=>ago('aob1'),2200);return el;
+},
+aob1(){
+  const el=document.createElement('div');el.className='ascreen';el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  el.innerHTML=`${asbar()}<div style="display:flex;gap:5px;align-items:center;padding:8px 28px"><div class="adot on"></div><div class="adot"></div><div class="adot"></div><div class="adot"></div></div><div style="flex:1;padding:16px 24px 0;overflow:auto"><div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 1 of 4</div><div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Let's get<br/>you covered.</div><div class="fu3" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:32px">2 minutes. Protects you from this Monday.</div><div class="fu4" style="display:flex;flex-direction:column;gap:16px"><div><label class="albl">Your name</label><input class="ainp" placeholder="Ravi Kumar" value="Ravi Kumar"></div><div><label class="albl">Mobile number</label><input class="ainp" placeholder="+91 98765 43210" value="+91 98765 43210" type="tel"></div></div></div><div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px"><button class="abtn abtn-white fu5" onclick="ago('aob2')">Continue →</button><div class="fu6" style="text-align:center;font-size:12px;color:var(--t3);padding:4px">🔒 Encrypted. Never shared.</div></div>`;
+  return el;
+},
+aob2(){
+  const el=document.createElement('div');el.className='ascreen';el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  el.innerHTML=`${asbar()}<div style="display:flex;gap:5px;align-items:center;padding:8px 28px"><div class="adot on"></div><div class="adot on"></div><div class="adot"></div><div class="adot"></div></div><div style="flex:1;padding:16px 24px 0;overflow:auto"><div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 2 of 4</div><div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Verify your<br/>identity.</div><div class="fu3" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:28px">PAN keeps the pool honest — protecting every worker.</div><div class="fu4" style="display:flex;flex-direction:column;gap:16px"><div><label class="albl">PAN number</label><input class="ainp" placeholder="ABCDE1234F" value="RJKRS9823P" style="text-transform:uppercase;letter-spacing:.08em"></div><div style="display:flex;gap:10px"><div style="flex:1"><label class="albl">OTP</label><input class="ainp" placeholder="6-digit OTP" value="847291" type="number"></div><button id="otpbtn" onclick="this.textContent='✓ Sent';this.style.background='var(--gd)';this.style.color='var(--green)'" style="margin-top:24px;padding:0 18px;background:var(--gd);border:1px solid var(--gb);border-radius:13px;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--green);cursor:pointer;white-space:nowrap">Send</button></div><div class="fu5 glass" style="padding:14px 16px;border-color:rgba(68,138,255,0.2)!important"><div style="font-size:12px;color:var(--t2);line-height:1.6"><strong style="color:var(--blue)">Why PAN?</strong> A fraud ring can't batch-create 500 PANs with real tax histories. Door closed before fraud begins.</div></div></div></div><div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px"><button class="abtn abtn-white fu5" onclick="ago('aob3')">Verify & Continue →</button><button class="abtn abtn-ghost fu6" onclick="ago('aob1')">Back</button></div>`;
+  return el;
+},
+aob3(){
+  const el=document.createElement('div');el.className='ascreen';el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  const zones=['Koramangala','Indiranagar','HSR Layout','Whitefield','JP Nagar','Electronic City'];
+  el.innerHTML=`${asbar()}<div style="display:flex;gap:5px;align-items:center;padding:8px 28px"><div class="adot on"></div><div class="adot on"></div><div class="adot on"></div><div class="adot"></div></div><div style="flex:1;padding:16px 24px 0;overflow:auto"><div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 3 of 4</div><div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Your delivery<br/>zone.</div><div class="fu3" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:24px">We monitor within <span style="color:var(--green);font-weight:700">3km of your zone</span> — not the entire city.</div><div class="fu4"><label class="albl">Platform</label><select class="ainp" style="margin-bottom:16px;appearance:none"><option>Zepto</option><option>Blinkit</option><option>Instamart</option><option>Dunzo</option></select></div><div class="fu5"><label class="albl">Select your area</label><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">${zones.map((z,i)=>`<div class="azone${i===0?' on':''}" onclick="document.querySelectorAll('.azone').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${z}</div>`).join('')}</div></div><div class="fu6 glass" style="margin-top:16px;padding:12px 16px;display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:4px;background:var(--green);box-shadow:0 0 8px var(--green)"></div><span style="font-size:13px;color:var(--t1);font-weight:600">Monitoring <span style="color:var(--green)">Koramangala</span> · 3km radius</span></div></div><div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px"><button class="abtn abtn-white" onclick="ago('aob4')">Continue →</button><button class="abtn abtn-ghost" onclick="ago('aob2')">Back</button></div>`;
+  return el;
+},
+aob4(){
+  const el=document.createElement('div');el.className='ascreen';
+  const plans=[{n:'Basic',p:'29',c:'800',s:'24hr',l:'Starter',col:'var(--blue)',sc:'sel-blue'},{n:'Plus',p:'49',c:'1,500',s:'2hr',l:'Most popular',col:'var(--green)',sc:'sel-green',rec:true},{n:'Pro',p:'79',c:'2,500',s:'Instant',l:'High earner',col:'var(--amber)',sc:'sel-amber'}];
+  el.innerHTML=`${asbar()}<div style="display:flex;gap:5px;align-items:center;padding:8px 28px"><div class="adot on"></div><div class="adot on"></div><div class="adot on"></div><div class="adot on"></div></div><div style="padding:16px 24px 0;overflow:auto;padding-bottom:10px"><div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 4 of 4</div><div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Pick your shield.</div><div class="fu3" style="font-size:14px;color:var(--t2);margin-bottom:24px">Your CladScore is <span style="color:var(--green);font-weight:700">72</span> — Plus is your best fit.</div><div class="fu4" style="display:flex;flex-direction:column;gap:10px">${plans.map((p,i)=>`<div class="aplan${i===1?' '+p.sc:''}" onclick="document.querySelectorAll('.aplan').forEach((c,j)=>{c.className='aplan'+(j===${i}?' ${plans[i].sc}':'')})"><${p.rec?`div style="position:absolute;top:-1px;right:20px;background:var(--green);color:#080808;font-size:10px;font-weight:800;padding:4px 10px;border-radius:0 0 8px 8px"`:''}>${ p.rec?'BEST FIT':''}</${p.rec?'div':'span'}><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:11px;font-weight:700;color:${p.col};text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">${p.l}</div><div style="font-size:20px;font-weight:900;color:var(--t1)">Clad ${p.n}</div><div style="font-size:12px;color:var(--t3);margin-top:3px">Cap ₹${p.c}/week · ${p.s} payout</div></div><div style="text-align:right"><div style="font-size:10px;color:var(--t3);margin-bottom:2px">per week</div><div class="display" style="font-size:32px;color:${p.col}">₹${p.p}</div></div></div></div>`).join('')}</div><div class="fu5 glass" style="padding:13px 16px;margin-top:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--t2)">Auto-renews every Monday</span><span style="font-size:13px;font-weight:700;color:var(--green)">Pause anytime</span></div></div><div style="padding:20px 24px 36px;display:flex;flex-direction:column;gap:10px"><button class="abtn abtn-green fu6" onclick="ago('abuilding')" style="font-size:17px">Activate Coverage →</button><button class="abtn abtn-ghost" onclick="ago('aob3')">Back</button></div>`;
+  return el;
+},
+abuilding(){
+  const el=document.createElement('div');el.className='ascreen';
+  el.style.cssText='background:linear-gradient(160deg,#080808,#0d1208,#080808);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:32px;min-height:100%';
+  const steps=['Connecting to Zepto…','Analysing 8-week history…','Building Earning DNA…','Calculating CladScore…','Activating coverage…'];
+  el.innerHTML=`<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><div class="glow-green" style="top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;opacity:.6"></div></div><div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:28px"><div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.25);display:flex;align-items:center;justify-content:center;animation:glowPulse 1.5s ease-in-out infinite"><svg width="36" height="36" fill="none" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" fill="rgba(0,230,118,.2)" stroke="var(--green)" stroke-width="1.5"/></svg></div><div style="text-align:center"><div class="display" style="font-size:34px;color:var(--t1);margin-bottom:6px">Setting up<br/>your shield.</div><div style="font-size:13px;color:var(--t3)" id="bstep">Connecting…</div></div><div style="width:100%"><div class="apbar"><div class="apfill" id="bfill" style="width:0%;background:linear-gradient(90deg,rgba(0,230,118,.7),var(--green));box-shadow:0 0 12px rgba(0,230,118,.4)"></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%">${[['8 weeks','History scanned'],['72/100','CladScore'],['Clad Plus','Plan selected'],['₹49/wk','Starting Monday']].map(([v,l])=>`<div class="glass" style="padding:14px;border-color:rgba(0,230,118,.08)!important"><div class="display" style="font-size:20px;color:var(--green);margin-bottom:2px">${v}</div><div style="font-size:11px;color:var(--t3)">${l}</div></div>`).join('')}</div></div>`;
+  let i=0;const iv=setInterval(()=>{i++;const f=el.querySelector('#bfill'),s=el.querySelector('#bstep');if(f)f.style.width=`${(i/steps.length)*100}%`;if(s)s.textContent=steps[i]||steps[steps.length-1];if(i>=steps.length-1){clearInterval(iv);setTimeout(()=>ago('ahome'),700);}},650);
+  return el;
+},
+ahome(){
+  const el=document.createElement('div');el.className='ascreen';
+  el.innerHTML=`<div style="position:relative;overflow:hidden;padding-bottom:4px"><div style="position:absolute;top:-60px;left:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.08),transparent 70%);pointer-events:none;filter:blur(30px)"></div>${asbar()}<div style="padding:4px 24px 20px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:2px">Hey there,</div><div style="font-size:28px;font-weight:900;color:var(--t1);letter-spacing:-.02em">Ravi Kumar 👋</div></div><div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--green)">RK</div></div></div></div><div style="padding:0 16px;margin-bottom:14px"><div class="fu1" onclick="ago('aalert')" style="background:linear-gradient(135deg,rgba(255,179,0,.12),rgba(255,179,0,.06));border:1px solid rgba(255,179,0,.3);border-radius:24px;padding:20px;cursor:pointer;animation:alertRing 2s ease-out infinite"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:4px;background:var(--amber);animation:glowPulse 1s ease-in-out infinite"></div><span style="font-size:10px;font-weight:800;color:var(--amber);letter-spacing:.14em;text-transform:uppercase">Live alert</span></div><div style="font-size:22px;font-weight:900;color:var(--t1);line-height:1.2">Heavy rain<br/>in your zone</div><div style="font-size:13px;color:var(--t2);margin-top:4px">Koramangala · 9.2mm/hr · 52 min</div></div><div style="text-align:right"><div style="font-size:11px;color:var(--t3);margin-bottom:2px">payout ready</div><div class="display" style="font-size:38px;color:var(--green);line-height:1">₹420</div></div></div><div style="background:rgba(255,179,0,.12);border:1px solid rgba(255,179,0,.2);border-radius:12px;padding:11px 16px;display:flex;justify-content:center;align-items:center;gap:8px"><span style="font-size:14px;font-weight:800;color:var(--amber)">Claim now</span><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div></div><div style="padding:0 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="fu2 glass" style="padding:16px"><div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">CladScore</div><div style="display:flex;align-items:center;gap:10px"><svg width="52" height="52" viewBox="0 0 100 100" style="flex-shrink:0"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10" stroke-linecap="round" class="ring-progress" style="--end:${251-(251*0.72)};filter:drop-shadow(0 0 6px var(--green))"/><text x="50" y="55" text-anchor="middle" font-size="26" font-weight="900" fill="var(--t1)" font-family="Instrument Serif">72</text></svg><div><div style="font-size:14px;font-weight:800;color:var(--green)">Good</div><div style="font-size:11px;color:var(--t3);line-height:1.4">+8 pts<br/>this week</div></div></div></div><div class="fu3 glass" style="padding:16px;background:linear-gradient(135deg,rgba(0,230,118,.06),transparent)!important;border-color:rgba(0,230,118,.12)!important"><div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Active Plan</div><div style="font-size:18px;font-weight:900;color:var(--t1);margin-bottom:4px">Clad Plus</div><div class="atag-green" style="margin-bottom:8px;font-size:10px">● Active</div><div style="font-size:12px;color:var(--t2)">Cap <strong style="color:var(--green)">₹1,500</strong>/wk</div><div style="font-size:11px;color:var(--t3);margin-top:2px">2hr auto-payout</div></div></div><div style="padding:0 16px;margin-bottom:14px"><div class="fu4 glass" style="padding:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:13px;font-weight:800;color:var(--t1)">This Week</div><div class="atag-dim" style="font-size:11px">Mar 18–24</div></div>${[{day:'Tuesday',ev:'Heavy rain · Claimed',amt:'₹420',c:'var(--green)'},{day:'Thursday',ev:'No disruptions',amt:'—',c:'var(--t3)'},{day:'Today',ev:'Rain alert · Pending',amt:'₹420',c:'var(--amber)'}].map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:${i<2?'1px solid var(--b1)':'none'}"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:4px;background:${r.c}"></div><div><div style="font-size:13px;font-weight:700;color:var(--t1)">${r.day}</div><div style="font-size:11px;color:var(--t3)">${r.ev}</div></div></div><div class="display" style="font-size:17px;color:${r.c}">${r.amt}</div></div>`).join('')}<div style="margin-top:12px;background:var(--gd);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:700;color:var(--green)">Total claimed this week</span><span class="display" style="font-size:20px;color:var(--green)">₹420</span></div></div></div><div style="height:16px"></div>${abnav('home')}`;
+  return el;
+},
+aalert(){
+  const el=document.createElement('div');el.className='ascreen';
+  const drops=Array.from({length:22},()=>({l:Math.random()*100,d:Math.random()*.9,h:7+Math.random()*12,dur:.55+Math.random()*.35}));
+  el.innerHTML=`<div style="background:linear-gradient(180deg,#061428 0%,#080808 100%);padding-bottom:28px;position:relative;overflow:hidden;min-height:260px">${asbar()}<div style="position:absolute;inset:0;pointer-events:none">${drops.map(d=>`<div style="position:absolute;left:${d.l}%;top:0;width:1.5px;height:${d.h}px;border-radius:1px;background:rgba(100,168,255,.55);opacity:0;animation:arain ${d.dur}s linear ${d.d}s infinite"></div>`).join('')}<div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,#080808)"></div></div><div style="padding:6px 24px 0;position:relative;z-index:2"><div style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;background:rgba(255,100,50,.15);color:#FF8060;border:1px solid rgba(255,100,50,.25);margin-bottom:14px" class="fu1">● Live disruption</div><div class="display fu2" style="font-size:38px;color:var(--t1);line-height:1.15;margin-bottom:8px">Heavy rain<br/>in your zone.</div><div class="fu3" style="display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:4px;background:var(--green);box-shadow:0 0 8px var(--green)"></div><span style="font-size:13px;color:var(--t2)">Koramangala · Pincode 560034</span></div></div></div><div style="padding:16px 16px;display:flex;flex-direction:column;gap:12px"><div class="fu1 glass" style="padding:18px"><div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Live Readings</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[['9.2 mm/hr','Rain intensity','green'],['52 min','Ongoing','green'],['11:34 AM','Trigger time','n'],['3km','Your zone','n']].map(([v,l,t])=>`<div style="background:${t==='green'?'rgba(0,230,118,.08)':'var(--s2)'};border-radius:14px;padding:14px;border:1px solid ${t==='green'?'rgba(0,230,118,.15)':'var(--b1)'}"><div class="display" style="font-size:22px;color:${t==='green'?'var(--green)':'var(--t1)'};">${v}</div><div style="font-size:11px;color:var(--t3);margin-top:3px">${l}</div></div>`).join('')}</div></div><div class="fu2 glass" style="padding:18px"><div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Trigger Validation</div>${[['Rainfall > 7.5mm/hr threshold','.0s'],['Duration > 45 minutes','.08s'],['Zone: Koramangala 560034','.16s'],['Fraud engine: 15/15 clean','.24s']].map(([c,d])=>`<div class="achk" style="animation:slideInRow .3s ${d} cubic-bezier(.16,1,.3,1) both"><div style="width:22px;height:22px;border-radius:7px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px rgba(0,230,118,.3)"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path class="check-path" d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span style="font-size:13px;color:var(--t1);font-weight:500">${c}</span></div>`).join('')}</div><div class="fu3" style="background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,230,118,.03));border:1px solid rgba(0,230,118,.15);border-radius:24px;padding:20px"><div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Your Payout</div>${[["Today's Earning DNA",'₹700'],['Heavy rain rate','× 60%']].map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);padding:4px 0"><span>${k}</span><span style="color:var(--t1);font-weight:700">${v}</span></div>`).join('')}<div style="height:1px;background:rgba(0,230,118,.15);margin:12px 0"></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700;color:var(--t1)">You receive</span><div class="display" style="font-size:44px;color:var(--green);line-height:1;filter:drop-shadow(0 0 20px rgba(0,230,118,.4))">₹420</div></div></div></div><div style="padding:0 16px 36px;display:flex;flex-direction:column;gap:10px"><button class="abtn abtn-green fu4" onclick="ago('aclaiming')" style="font-size:17px">Claim ₹420 Now →</button><button class="abtn abtn-ghost fu5" onclick="ago('ahome')">Back to home</button></div>`;
+  return el;
+},
+aclaiming(){
+  const el=document.createElement('div');el.className='ascreen';
+  el.style.cssText='background:linear-gradient(160deg,#080808,#061410,#080808);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:32px;gap:28px';
+  const steps=['Validating trigger data…','Running 15 fraud signals…','Zone consensus: 43 workers…','Initiating UPI transfer…'];
+  el.innerHTML=`<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.1),transparent 70%);filter:blur(40px)"></div></div><div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:24px"><div style="width:72px;height:72px;border-radius:22px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;animation:glowPulse 1.2s ease-in-out infinite"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="text-align:center"><div class="display" style="font-size:30px;color:var(--t1);margin-bottom:6px">Processing<br/>your claim</div><div style="font-size:13px;color:var(--t3)">Fraud-free in under 3 seconds</div></div><div style="width:100%;display:flex;flex-direction:column;gap:8px" id="csteps">${steps.map((s,i)=>`<div id="cs${i}" style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:12px;background:${i===0?'rgba(0,230,118,.06)':'transparent'};border:1px solid ${i===0?'rgba(0,230,118,.12)':'transparent'};opacity:${i===0?1:.3};transition:all .4s ease"><div id="ci${i}" style="width:22px;height:22px;border-radius:7px;background:${i===0?'rgba(0,230,118,.15)':'var(--s2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s">${i===0?`<div style="width:7px;height:7px;border-radius:4px;background:var(--green);animation:glowPulse .8s ease-in-out infinite"></div>`:''}</div><span style="font-size:13px;color:var(--t1);font-weight:500">${s}</span></div>`).join('')}</div><div style="width:100%"><div class="apbar" style="height:4px"><div class="apfill" id="cpfill" style="width:0%;background:linear-gradient(90deg,rgba(0,230,118,.6),var(--green));box-shadow:0 0 10px rgba(0,230,118,.4)"></div></div></div></div>`;
+  let step=0;
+  const iv=setInterval(()=>{
+    const ci=el.querySelector(`#ci${step}`),cs=el.querySelector(`#cs${step}`);
+    if(ci){ci.innerHTML=`<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/></svg>`;ci.style.background='var(--green)';ci.style.boxShadow='0 0 8px rgba(0,230,118,.5)';}
+    if(cs){cs.style.background='rgba(0,230,118,.04)';cs.style.borderColor='rgba(0,230,118,.1)';}
+    step++;
+    const f=el.querySelector('#cpfill');if(f)f.style.width=`${(step/steps.length)*100}%`;
+    if(step<steps.length){const ns=el.querySelector(`#cs${step}`),ni=el.querySelector(`#ci${step}`);if(ns){ns.style.opacity='1';ns.style.background='rgba(0,230,118,.06)';ns.style.borderColor='rgba(0,230,118,.12)';}if(ni){ni.innerHTML=`<div style="width:7px;height:7px;border-radius:4px;background:var(--green);animation:glowPulse .8s ease-in-out infinite"></div>`;ni.style.background='rgba(0,230,118,.15)';}}
+    if(step>=steps.length){clearInterval(iv);setTimeout(()=>ago('apayout'),500);}
+  },780);
+  return el;
+},
+apayout(){
+  const el=document.createElement('div');el.className='ascreen';
+  el.style.cssText='background:linear-gradient(160deg,#060f08,#080808 60%);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:32px;gap:20px';
+  el.innerHTML=`<div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><div style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.15),transparent 70%);filter:blur(40px);animation:glowPulse 3s ease-in-out infinite"></div></div><div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:20px"><div style="width:84px;height:84px;border-radius:26px;background:var(--green);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(0,230,118,.5),0 0 120px rgba(0,230,118,.2);animation:scaleSpring .5s cubic-bezier(.34,1.56,.64,1) forwards"><svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path class="check-path" d="M5 12l5 5L20 7" stroke="#080808" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="text-align:center;animation:countUp .5s cubic-bezier(.34,1.56,.64,1) .2s both"><div style="font-size:12px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px">Payout sent</div><div class="display" style="font-size:72px;color:var(--green);line-height:1;filter:drop-shadow(0 0 30px rgba(0,230,118,.5))">₹420</div><div style="font-size:14px;color:var(--t3);margin-top:6px">Credited to UPI · 94 minutes</div></div><div class="glass" style="width:100%;padding:18px;animation:fadeUp .4s .4s cubic-bezier(.16,1,.3,1) both">${[['Reference','CLD-2406-0034'],['Trigger','Heavy rain · 9.2mm/hr'],['Earning DNA','₹700 × 60%'],['Plan','Clad Plus'],['Status','✓ Credited']].map(([k,v],i,a)=>`<div style="display:flex;justify-content:space-between;padding:9px 0;${i<a.length-1?'border-bottom:1px solid var(--b1)':''}"><span style="font-size:12px;color:var(--t3)">${k}</span><span style="font-size:12px;color:var(--t1);font-weight:700">${v}</span></div>`).join('')}</div><div style="width:100%;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.12);border-radius:14px;padding:13px 16px;animation:fadeUp .4s .5s cubic-bezier(.16,1,.3,1) both"><div style="font-size:12px;color:var(--t2);line-height:1.6"><span style="color:var(--green);font-weight:700">43 workers</span> in Koramangala claimed this event. Zone consensus verified. No fraud flags.</div></div><button class="abtn abtn-green" onclick="ago('ahome')" style="width:100%;animation:fadeUp .4s .6s cubic-bezier(.16,1,.3,1) both">Back to Home</button></div>`;
+  return el;
+},
+apolicy(){
+  const el=document.createElement('div');el.className='ascreen';
+  const trigs=[['🌧️','Heavy rain','> 7.5mm/hr · 45+ min','60%'],['🌡️','Extreme heat','> 42°C · 11am–4pm','40%'],['😷','Toxic AQI','> 300 · 3+ hrs','50%'],['🌊','Flood alert','Zone alert active','80%'],['📉','App outage','> 60% drop · 90+ min','40%'],['🚧','Curfew/bandh','Zone closure','70%']];
+  el.innerHTML=`<div style="position:relative;overflow:hidden">${asbar()}<div style="padding:4px 24px 20px"><div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Protection details</div><div style="font-size:28px;font-weight:900;color:var(--t1);letter-spacing:-.02em">My Shield</div></div></div><div style="padding:0 16px;display:flex;flex-direction:column;gap:12px"><div class="fu1" style="background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(0,230,118,.03));border:1px solid rgba(0,230,118,.15);border-radius:24px;padding:22px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Active Plan</div><div style="font-size:26px;font-weight:900;color:var(--t1)">Clad Plus</div></div><div class="atag-green">● Live</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">${[['₹1,500','Weekly cap'],['2hr','Payout speed'],['₹49','Weekly cost']].map(([v,l])=>`<div style="background:rgba(0,230,118,.08);border-radius:12px;padding:11px;text-align:center;border:1px solid rgba(0,230,118,.1)"><div class="display" style="font-size:18px;color:var(--green)">${v}</div><div style="font-size:10px;color:var(--t3);margin-top:2px">${l}</div></div>`).join('')}</div></div><div class="fu2 glass" style="padding:18px"><div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">What triggers a payout</div>${trigs.map(([ic,n,t,r],i,a)=>`<div style="display:flex;align-items:center;gap:12px;padding:11px 0;${i<a.length-1?'border-bottom:1px solid var(--b1)':''}"><div style="width:38px;height:38px;border-radius:11px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">${ic}</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--t1)">${n}</div><div style="font-size:11px;color:var(--t3)">${t}</div></div><div class="atag-green" style="font-size:11px">${r}</div></div>`).join('')}</div><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><button class="abtn abtn-ghost" style="color:var(--amber);border-color:rgba(255,179,0,.2)">Pause this week</button><button class="abtn abtn-ghost" onclick="ago('aob4')">Upgrade to Pro →</button></div></div>${abnav('policy')}`;
+  return el;
+},
+aprofile(){
+  const el=document.createElement('div');el.className='ascreen';
+  el.innerHTML=`${asbar()}<div style="padding:4px 24px 0;margin-bottom:20px"><div class="fu1" style="display:flex;align-items:center;gap:14px"><div style="width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:var(--green)">RK</div><div><div style="font-size:20px;font-weight:900;color:var(--t1)">Ravi Kumar</div><div style="font-size:13px;color:var(--t3)">Zepto · Koramangala</div></div></div><div class="fu2 glass" style="margin-top:16px;padding:16px;display:flex;align-items:center;gap:16px"><svg width="60" height="60" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10" stroke-linecap="round" class="ring-progress" style="--end:${251-(251*0.72)};filter:drop-shadow(0 0 4px var(--green))"/><text x="50" y="55" text-anchor="middle" font-size="28" font-weight="900" fill="var(--t1)" font-family="Instrument Serif">72</text></svg><div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:2px">CladScore · Good</div><div style="font-size:12px;color:var(--t3);margin-bottom:8px">3 weeks streak · +8 pts</div><div class="apbar"><div class="apfill" style="width:72%;background:var(--green);box-shadow:0 0 8px rgba(0,230,118,.3)"></div></div></div></div></div><div style="padding:0 16px;display:flex;flex-direction:column;gap:12px"><div class="fu3 glass" style="padding:18px"><div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Earning DNA</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">${[['₹620','Weekday avg'],['₹880','Weekend avg'],['7–9 PM','Peak hours'],['Sunday','Best day']].map(([v,l])=>`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px;text-align:center"><div class="display" style="font-size:18px;color:var(--t1)">${v}</div><div style="font-size:10px;color:var(--t3);margin-top:3px">${l}</div></div>`).join('')}</div><div style="background:var(--gd);border:1px solid var(--gb);border-radius:11px;padding:11px 13px"><div style="font-size:12px;color:var(--green);line-height:1.5">Payouts based on <strong>your</strong> earnings — not a flat ₹500/day average.</div></div></div><div class="fu4 glass" style="padding:18px"><div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Claim History</div>${[['Mar 18','Heavy rain · Koramangala','₹420'],['Mar 12','Heavy rain · Koramangala','₹365'],['Mar 5','AQI alert · Bengaluru','₹320']].map(([d,e,a],i,arr)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;${i<arr.length-1?'border-bottom:1px solid var(--b1)':''}"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:4px;background:var(--green)"></div><div><div style="font-size:13px;font-weight:700;color:var(--t1)">${e}</div><div style="font-size:11px;color:var(--t3)">${d}</div></div></div><div class="display" style="font-size:17px;color:var(--green)">${a}</div></div>`).join('')}<div style="margin-top:12px;background:var(--gd);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:700;color:var(--green)">Total claimed</span><span class="display" style="font-size:22px;color:var(--green)">₹1,105</span></div></div><div style="height:16px"></div></div>${abnav('profile')}`;
+  return el;
+},
+};
+
+// ══════════ OPS DASHBOARD ══════════
+function showDView(name){
+  document.querySelectorAll('.dsb-item').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.dsb-item').forEach(el=>{if(el.getAttribute('onclick')?.includes(`'${name}'`))el.classList.add('on');});
+  const titles={overview:'Overview',triggers:'Live Triggers',claims:'Claims',fraud:'Fraud Engine',workers:'Workers',payouts:'Payouts'};
+  document.getElementById('dash-title').textContent=titles[name]||name;
+  document.getElementById('dcontent').innerHTML=DVIEWS[name]?DVIEWS[name]():'<div style="color:rgba(232,228,220,0.4);padding:20px">Coming soon</div>';
+}
+
+const DVIEWS={
+overview(){
+  return`
+  <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;cursor:pointer" onclick="showDView('triggers')">
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,.15);display:flex;align-items:center;justify-content:center;font-size:20px">🌧️</div><div><div style="font-size:14px;font-weight:700;color:#F59E0B">Heavy rain active — 2 zones affected</div><div style="font-size:12px;color:rgba(232,228,220,0.45)">Koramangala · Indiranagar · 43 workers triggered · ₹18,060 payout initiated</div></div></div>
+    <div style="font-size:13px;color:#F59E0B;font-weight:600">View →</div>
+  </div>
+  <div class="dmetrics">
+    <div class="dmetric"><div class="dm-lbl">Active Workers</div><div class="dm-val">1,247</div><div class="dm-sub" style="color:#00E676">↑ 34 this week</div></div>
+    <div class="dmetric"><div class="dm-lbl">Active Policies</div><div class="dm-val">1,089</div><div class="dm-sub" style="color:rgba(232,228,220,0.45)">87% coverage</div></div>
+    <div class="dmetric"><div class="dm-lbl">Claims Today</div><div class="dm-val">43</div><div class="dm-sub" style="color:#F59E0B">2 in review</div></div>
+    <div class="dmetric"><div class="dm-lbl">Payouts Today</div><div class="dm-val">₹18.1K</div><div class="dm-sub" style="color:#00E676">Pool health 87%</div></div>
+  </div>
+  <div class="dg2">
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Zone Status — Bengaluru</div><div class="dcard-act" onclick="showDView('triggers')">View all →</div></div>
+      <div class="zone-grid">
+        ${[['Koramangala','41 triggered','critical'],['Indiranagar','28 triggered','critical'],['HSR Layout','12 triggered','watch'],['Whitefield','Clear',''],['JP Nagar','Clear',''],['Marathahalli','Clear','']].map(([z,c,cls])=>`<div class="zone-cell ${cls}"><div class="zdot" style="background:${cls==='critical'?'#EF4444':cls==='watch'?'#F59E0B':'#00E676'}"></div><div class="zone-name">${z}</div><div class="zone-cnt">${c}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Claim Lane Routing</div><div class="dcard-act" onclick="showDView('claims')">All claims →</div></div>
+      <div class="lane-row lane-g"><div style="font-size:16px">🟢</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#00E676">Green Lane</div><div style="font-size:11px;color:rgba(232,228,220,0.45)">Auto-payout in 2 hours</div></div><div style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:#00E676">38</div></div>
+      <div class="lane-row lane-a"><div style="font-size:16px">🟡</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#F59E0B">Yellow Lane</div><div style="font-size:11px;color:rgba(232,228,220,0.45)">6hr hold → auto-approve</div></div><div style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:#F59E0B">3</div></div>
+      <div class="lane-row lane-r"><div style="font-size:16px">🔴</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#EF4444">Red Lane</div><div style="font-size:11px;color:rgba(232,228,220,0.45)">24hr manual review</div></div><div style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:#EF4444">2</div></div>
+    </div>
+  </div>
+  <div class="dg2">
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Pool Health</div></div>
+      ${[['Premium collected','₹53,361','100%',100,'#60A5FA'],['Estimated payouts','₹18,060','33.8%',33.8,'#00E676'],['Reserve buffer','₹35,301','66.2%',66.2,'#00E676']].map(([l,v,p,w,c])=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:rgba(232,228,220,0.45)">${l}</span><span style="color:#E8E4DC;font-weight:600">${v}</span></div><div class="dprog"><div class="dpfill" style="width:${w}%;background:${c}"></div></div></div>`).join('')}
+      <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:12px;margin-top:4px"><div style="font-size:12px;color:#00E676;font-weight:600">Pool solvent at current payout rate. Actuarial model stable.</div></div>
+    </div>
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Payouts — Last 7 Days</div></div>
+      <div class="bar-chart">${[['Mon','12.4',60],['Tue','8.2',40],['Wed','3.1',15],['Thu','0.8',4],['Fri','22.1',100],['Sat','9.7',47],['Sun','18.1',87]].map(([d,v,h])=>`<div class="bar-col"><div class="bar-val">₹${v}K</div><div class="bar-fill" style="height:${h}%;background:${h===100?'#F59E0B':'#1A1A16'}"></div><div class="bar-lbl">${d}</div></div>`).join('')}</div>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">${[['₹74.4K','This week'],['₹391','Avg per claim']].map(([v,l])=>`<div style="background:#1A1A16;border-radius:9px;padding:10px"><div style="font-size:10px;color:rgba(232,228,220,0.45)">${l}</div><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:800;color:#E8E4DC">${v}</div></div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="dcard">
+    <div class="dcard-hd"><div class="dcard-title">Recent Claims</div><div class="dcard-act" onclick="showDView('claims')">View all →</div></div>
+    <table class="dtbl"><tr><th>Worker</th><th>Zone</th><th>Trigger</th><th>Amount</th><th>Lane</th><th>Time</th></tr>
+    ${[['Ravi Kumar','Koramangala','Heavy Rain','₹420','green','11:34'],['Priya Sharma','Koramangala','Heavy Rain','₹380','green','11:36'],['Amit Joshi','Indiranagar','Heavy Rain','₹450','yellow','11:38'],['Suresh M.','HSR Layout','Heavy Rain','₹320','yellow','11:39'],['Unknown-1','Koramangala','Heavy Rain','₹800','red','11:40']].map(([w,z,t,a,l,time])=>`<tr><td style="font-weight:600">${w}</td><td style="color:rgba(232,228,220,0.45)">${z}</td><td>${t}</td><td style="font-family:'Fraunces',serif;font-weight:700">${a}</td><td><span class="dbadge ${l==='green'?'db-green':l==='yellow'?'db-amber':'db-red'}">● ${l[0].toUpperCase()+l.slice(1)}</span></td><td style="color:rgba(232,228,220,0.45)">${time}</td></tr>`).join('')}
+    </table>
+  </div>`;
+},
+triggers(){
+  return`
+  <div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,228,220,0.45);margin-bottom:14px">Active Triggers — Real Time</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    ${[['Koramangala','560034','Heavy Rain','9.2mm/hr','52 min',41,'critical'],['Indiranagar','560038','Heavy Rain','7.8mm/hr','47 min',28,'critical'],['HSR Layout','560102','Heavy Rain','6.1mm/hr','32 min',12,'watch'],['Whitefield','560066','Clear','—','—',0,''],['JP Nagar','560078','Clear','—','—',0,''],['Marathahalli','560037','Clear','—','—',0,'']].map(([z,p,t,i,d,w,cls])=>`
+    <div class="dcard" style="${cls==='critical'?'border-color:rgba(239,68,68,.3)':cls==='watch'?'border-color:rgba(245,158,11,.3)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px"><div><div style="font-size:15px;font-weight:700;color:#E8E4DC">${z}</div><div style="font-size:11px;color:rgba(232,228,220,0.45)">Pincode ${p}</div></div><span class="dbadge ${cls==='critical'?'db-red':cls==='watch'?'db-amber':'db-green'}">● ${cls==='critical'?'Active':cls==='watch'?'Watch':'Clear'}</span></div>
+      ${cls?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">${[[''+i,'Intensity'],[''+d,'Duration']].map(([v,l])=>`<div style="background:#1A1A16;border-radius:8px;padding:8px;text-align:center"><div style="font-family:'Fraunces',serif;font-size:16px;font-weight:800;color:${cls==='critical'?'#EF4444':'#F59E0B'}">${v}</div><div style="font-size:10px;color:rgba(232,228,220,0.45)">${l}</div></div>`).join('')}</div><div style="background:rgba(239,68,68,0.1);border-radius:8px;padding:8px;text-align:center"><div style="font-size:13px;font-weight:700;color:#EF4444">${w} workers triggered</div></div>`:`<div style="background:rgba(0,230,118,0.1);border-radius:8px;padding:10px;text-align:center"><div style="font-size:13px;font-weight:600;color:#00E676">No active disruption</div></div>`}
+    </div>`).join('')}
+  </div>
+  <div class="dcard">
+    <div class="dcard-hd"><div class="dcard-title">API Sources</div></div>
+    <table class="dtbl"><tr><th>Source</th><th>Type</th><th>Last Update</th><th>Status</th></tr>
+    ${[['Open-Meteo','Weather (rain, heat)','30 sec ago','Connected'],['AQICN','Air Quality Index','2 min ago','Connected'],['Tomorrow.io','Flood zone alerts','5 min ago','Connected'],['data.gov.in','Civic / Govt alerts','1 min ago','Connected'],['Mock Platform API','Zepto order volume','15 sec ago','Connected']].map(([s,t,u,st])=>`<tr><td style="font-weight:600">${s}</td><td style="color:rgba(232,228,220,0.45)">${t}</td><td style="color:rgba(232,228,220,0.45)">${u}</td><td><span class="dbadge db-green">● ${st}</span></td></tr>`).join('')}
+    </table>
+  </div>`;
+},
+claims(){
+  return`
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    ${[['All',43],['🟢 Green',38],['🟡 Yellow',3],['🔴 Red',2]].map(([l,n])=>`<div style="background:#131310;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;color:rgba(232,228,220,0.45);cursor:pointer">${l} <span style="color:#E8E4DC">${n}</span></div>`).join('')}
+  </div>
+  <div class="dcard">
+    <div class="dcard-hd"><div class="dcard-title">Claims — Today</div><div style="font-size:12px;color:rgba(232,228,220,0.45)">43 total · ₹18,060 pending</div></div>
+    <table class="dtbl"><tr><th>Reference</th><th>Worker</th><th>Zone</th><th>Amount</th><th>Lane</th><th>CladScore</th><th>Status</th></tr>
+    ${[['CLD-240034','Ravi Kumar','Koramangala','₹420','green',72,'Paid'],['CLD-240035','Priya Sharma','Koramangala','₹380','green',81,'Processing'],['CLD-240036','Amit Joshi','Indiranagar','₹450','yellow',58,'On hold'],['CLD-240037','Suresh M.','HSR Layout','₹320','yellow',62,'On hold'],['CLD-240038','Unknown-1','Koramangala','₹800','red',12,'Review'],['CLD-240039','Unknown-2','Koramangala','₹800','red',8,'Review'],['CLD-240040','Deepak R.','JP Nagar','₹290','green',76,'Paid']].map(([ref,w,z,a,l,sc,st])=>`<tr><td style="font-family:monospace;font-size:12px;color:rgba(232,228,220,0.45)">${ref}</td><td style="font-weight:600">${w}</td><td style="color:rgba(232,228,220,0.45)">${z}</td><td style="font-family:'Fraunces',serif;font-weight:700">${a}</td><td><span class="dbadge ${l==='green'?'db-green':l==='yellow'?'db-amber':'db-red'}">${l==='green'?'🟢 Auto':l==='yellow'?'🟡 Hold':'🔴 Review'}</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="width:32px;height:5px;background:#1A1A16;border-radius:3px;overflow:hidden"><div style="height:100%;width:${sc}%;background:${sc>70?'#00E676':sc>40?'#F59E0B':'#EF4444'};border-radius:3px"></div></div><span style="font-size:12px;color:rgba(232,228,220,0.45)">${sc}</span></div></td><td style="color:rgba(232,228,220,0.45)">${st}</td></tr>`).join('')}
+    </table>
+  </div>`;
+},
+fraud(){
+  return`
+  <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-size:14px;font-weight:700;color:#EF4444">2 fraud flags detected in today's event</div><div style="font-size:12px;color:rgba(232,228,220,0.45)">Coordinated GPS spoofing attempt · Routed to red lane · Pool protected</div></div>
+    <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#EF4444">2</div>
+  </div>
+  <div class="dg2">
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Fraud Flags</div></div>
+      ${[{id:'FR-001',type:'Coordinated batch · 2 accounts',signals:['GPS variance=0','Timestamp cluster','New accounts (<3d)'],score:94,action:'Red lane · Manual review'},{id:'FR-002',type:'Behavior mismatch · 1 account',signals:['Biometric anomaly','Cell tower mismatch'],score:78,action:'Yellow lane · Enhanced watch'}].map(f=>`<div style="background:#1A1A16;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.07)"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:10px;font-weight:700;color:rgba(232,228,220,0.45);text-transform:uppercase;letter-spacing:.08em">${f.id}</div><div style="font-size:14px;font-weight:700;color:#E8E4DC;margin-top:2px">${f.type}</div></div><div style="background:rgba(239,68,68,0.1);border-radius:9px;padding:6px 10px;text-align:center"><div style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:#EF4444">${f.score}</div><div style="font-size:9px;color:#EF4444">RISK</div></div></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${f.signals.map(s=>`<span class="dbadge db-red">${s}</span>`).join('')}</div><div style="font-size:12px;color:rgba(232,228,220,0.45);background:#0D0D0B;border-radius:8px;padding:8px">${f.action}</div></div>`).join('')}
+    </div>
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Signal Coverage</div></div>
+      ${[['GPS Variance','Layer 1','green',2],['Accelerometer','Layer 1','green',1],['Cell Tower','Layer 1','green',2],['Behavioral Bio.','Layer 1','amber',1],['PAN Verification','Layer 2','green',0],['Timestamp Cluster','Layer 2','green',1],['Account Spike','Layer 2','amber',1],['Patient Zero','Layer 2','green',0],['Honeypot Zones','Proactive','green',0]].map(([n,l,s,c])=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="width:7px;height:7px;border-radius:4px;flex-shrink:0;background:${s==='green'?'#00E676':'#F59E0B'}"></div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:#E8E4DC">${n}</div><div style="font-size:10px;color:rgba(232,228,220,0.2)">${l}</div></div>${c>0?`<span class="dbadge db-red">${c} caught</span>`:'<span style="font-size:11px;color:rgba(232,228,220,0.2)">Clean</span>'}</div>`).join('')}
+    </div>
+  </div>`;
+},
+workers(){
+  return`
+  <div class="dmetrics" style="grid-template-columns:repeat(3,1fr)">
+    <div class="dmetric"><div class="dm-lbl">Total Registered</div><div class="dm-val">1,247</div><div class="dm-sub" style="color:#00E676">↑ 34 this week</div></div>
+    <div class="dmetric"><div class="dm-lbl">Active Policies</div><div class="dm-val">1,089</div><div class="dm-sub" style="color:rgba(232,228,220,0.45)">87% coverage</div></div>
+    <div class="dmetric"><div class="dm-lbl">Avg CladScore</div><div class="dm-val">68</div><div class="dm-sub" style="color:#00E676">↑ 2 this week</div></div>
+  </div>
+  <div class="dg2">
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">CladScore Distribution</div></div>
+      ${[['80–100 (Pro eligible)','324','26%',26,'#00E676'],['50–79 (Plus eligible)','612','49%',49,'#60A5FA'],['0–49 (Basic)','313','25%',25,'#F59E0B']].map(([r,c,p,w,col])=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="color:rgba(232,228,220,0.45)">${r}</span><span style="color:#E8E4DC;font-weight:600">${c} workers</span></div><div class="dprog"><div class="dpfill" style="width:${w}%;background:${col}"></div></div></div>`).join('')}
+    </div>
+    <div class="dcard">
+      <div class="dcard-hd"><div class="dcard-title">Plan Distribution</div></div>
+      ${[['Clad Basic (₹29/wk)','298 workers',27],['Clad Plus (₹49/wk)','612 workers',56],['Clad Pro (₹79/wk)','179 workers',17]].map(([p,c,w])=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="color:rgba(232,228,220,0.45)">${p}</span><span style="color:#E8E4DC;font-weight:600">${c}</span></div><div class="dprog"><div class="dpfill" style="width:${w}%;background:#60A5FA"></div></div></div>`).join('')}
+    </div>
+  </div>`;
+},
+payouts(){
+  return`
+  <div class="dmetrics">
+    <div class="dmetric"><div class="dm-lbl">Today's Payouts</div><div class="dm-val">₹18.1K</div><div class="dm-sub" style="color:#00E676">43 transactions</div></div>
+    <div class="dmetric"><div class="dm-lbl">This Week</div><div class="dm-val">₹74.4K</div><div class="dm-sub" style="color:rgba(232,228,220,0.45)">vs ₹53K last week</div></div>
+    <div class="dmetric"><div class="dm-lbl">Avg Payout</div><div class="dm-val">₹391</div><div class="dm-sub" style="color:rgba(232,228,220,0.45)">per claim</div></div>
+    <div class="dmetric"><div class="dm-lbl">Pool Balance</div><div class="dm-val">₹35.3K</div><div class="dm-sub" style="color:#00E676">Buffer healthy</div></div>
+  </div>
+  <div class="dcard">
+    <div class="dcard-hd"><div class="dcard-title">Recent Payouts</div></div>
+    <table class="dtbl"><tr><th>Reference</th><th>Worker</th><th>Amount</th><th>Method</th><th>Status</th><th>Time</th></tr>
+    ${[['CLD-240034','Ravi Kumar',420,'UPI','Sent','11:34'],['CLD-240035','Priya Sharma',380,'UPI','Sent','11:36'],['CLD-240040','Deepak R.',290,'UPI','Processing','11:41'],['CLD-240036','Amit Joshi',450,'UPI','On hold','11:38']].map(([r,w,a,m,s,t])=>`<tr><td style="font-family:monospace;font-size:12px;color:rgba(232,228,220,0.45)">${r}</td><td style="font-weight:600">${w}</td><td style="font-family:'Fraunces',serif;font-weight:700">₹${a}</td><td>${m}</td><td><span class="dbadge ${s==='Sent'?'db-green':s==='Processing'?'db-blue':'db-amber'}">${s}</span></td><td style="color:rgba(232,228,220,0.45)">${t}</td></tr>`).join('')}
+    </table>
+  </div>`;
+},
+};
+</script>
+</body>
+</html>
