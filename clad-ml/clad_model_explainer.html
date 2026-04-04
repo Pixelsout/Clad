@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clad — Model Pipeline Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --bg2: #111113;
+    --bg3: #18181b;
+    --bg4: #1f1f23;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f0;
+    --text2: #888;
+    --text3: #555;
+    --accent: #e8ff6b;
+    --accent2: #6bffb8;
+    --accent3: #ff6b6b;
+    --accent4: #6bb3ff;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,11,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 0;
+  }
+  .nav-brand {
+    font-size: 15px; font-weight: 700; color: var(--accent);
+    padding: 1rem 1.5rem 1rem 0;
+    border-right: 1px solid var(--border);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .nav-tabs { display: flex; gap: 0; overflow-x: auto; }
+  .nav-tab {
+    padding: 0 1.25rem; height: 56px; display: flex; align-items: center;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text3); cursor: pointer; border: none; background: transparent;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: color .2s, border-color .2s;
+  }
+  .nav-tab:hover { color: var(--text2); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-badge {
+    font-size: 9px; background: var(--accent); color: #000;
+    padding: 1px 5px; border-radius: 3px; margin-left: 6px; font-weight: 700;
+  }
+
+  /* ── SECTIONS ── */
+  .section { display: none; padding: 2rem; max-width: 1280px; margin: 0 auto; }
+  .section.active { display: block; animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* ── TYPOGRAPHY ── */
+  .page-title {
+    font-size: 28px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.03em; margin-bottom: 4px;
+  }
+  .page-sub { font-size: 13px; color: var(--text2); margin-bottom: 2rem; }
+  .section-label {
+    font-family: var(--mono); font-size: 10px; color: var(--text3);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem 1.5rem;
+  }
+  .card-dark { background: var(--bg3); border-color: var(--border); }
+  .metric-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: .875rem 1rem;
+  }
+  .metric-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  .metric-val { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -.02em; }
+  .metric-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* ── GRIDS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: .875rem; }
+  @media (max-width: 900px) {
+    .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+  }
+
+  /* ── INPUTS ── */
+  .input-group { margin-bottom: .875rem; }
+  .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .input-label { font-size: 12px; color: var(--text2); }
+  .input-val { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 500; }
+  input[type=range] {
+    width: 100%; height: 4px; border-radius: 2px;
+    background: var(--bg4); outline: none; border: none; cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+    border: 2px solid var(--bg);
+    transition: transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text); padding: 8px 10px; border-radius: 8px;
+    font-family: var(--sans); font-size: 12px; cursor: pointer; outline: none;
+  }
+  select:focus { border-color: var(--accent); }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; }
+  input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+  .checkbox-row label { font-size: 12px; color: var(--text2); cursor: pointer; }
+
+  /* ── SCORE BAR ── */
+  .score-bar-track { height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; margin: 6px 0; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width .4s ease; }
+
+  /* ── GRADE BADGE ── */
+  .grade-badge {
+    font-family: var(--mono); font-size: 28px; font-weight: 700;
+    width: 56px; height: 56px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid;
+  }
+  .grade-ap { border-color: #e8ff6b; color: #e8ff6b; background: rgba(232,255,107,.08); }
+  .grade-a  { border-color: #6bffb8; color: #6bffb8; background: rgba(107,255,184,.08); }
+  .grade-bp { border-color: #6bb3ff; color: #6bb3ff; background: rgba(107,179,255,.08); }
+  .grade-b  { border-color: #aaa;    color: #aaa;    background: rgba(170,170,170,.08); }
+  .grade-c  { border-color: #ffa96b; color: #ffa96b; background: rgba(255,169,107,.08); }
+  .grade-d  { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255,107,107,.08); }
+
+  /* ── PILL ── */
+  .pill { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+  .pill-g { background: rgba(107,255,184,.12); color: #6bffb8; border: 1px solid rgba(107,255,184,.25); }
+  .pill-y { background: rgba(232,255,107,.12); color: #e8ff6b; border: 1px solid rgba(232,255,107,.25); }
+  .pill-r { background: rgba(255,107,107,.12); color: #ff6b6b; border: 1px solid rgba(255,107,107,.25); }
+  .pill-b { background: rgba(107,179,255,.12); color: #6bb3ff; border: 1px solid rgba(107,179,255,.25); }
+
+  /* ── ADJUSTMENTS ── */
+  .adj-row {
+    display: flex; align-items: center; padding: 8px 0;
+    border-bottom: 1px solid var(--border); gap: 10px;
+  }
+  .adj-row:last-child { border: none; }
+  .adj-name { flex: 1; font-size: 12px; color: var(--text); }
+  .adj-desc { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 1px; }
+  .adj-bar-track { width: 70px; height: 5px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .adj-bar-fill { height: 100%; border-radius: 3px; }
+  .adj-val { font-family: var(--mono); font-size: 12px; font-weight: 500; min-width: 52px; text-align: right; }
+
+  /* ── FLOW PIPELINE ── */
+  .pipeline-flow {
+    display: flex; align-items: stretch; gap: 0;
+    overflow-x: auto; padding: 1rem 0;
+  }
+  .flow-node {
+    flex: 1; min-width: 160px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    position: relative;
+  }
+  .flow-node-title { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .flow-node-val { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.02em; }
+  .flow-node-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .flow-arrow {
+    display: flex; align-items: center; padding: 0 6px;
+    color: var(--text3); font-size: 20px; flex-shrink: 0;
+  }
+
+  /* ── FEATURE IMPORTANCE ── */
+  .feat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .feat-name { font-size: 12px; color: var(--text2); width: 160px; flex-shrink: 0; }
+  .feat-track { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .feat-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+  .feat-pct { font-family: var(--mono); font-size: 11px; color: var(--text2); min-width: 36px; text-align: right; }
+
+  /* ── TRIGGER SIM ── */
+  .trigger-status { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; }
+  .trigger-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .trigger-label { font-size: 13px; }
+
+  /* ── LOG ── */
+  .log-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem;
+    font-family: var(--mono); font-size: 11px; color: var(--text2);
+    max-height: 200px; overflow-y: auto; line-height: 1.8;
+  }
+  .log-g { color: #6bffb8; }
+  .log-y { color: #e8ff6b; }
+  .log-r { color: #ff6b6b; }
+  .log-b { color: #6bb3ff; }
+
+  /* ── DATA TABLE ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  .data-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  .data-table tr:last-child td { border: none; }
+  .data-table tr:hover td { background: var(--bg3); color: var(--text); }
+
+  /* ── STRENGTHS / FLAGS ── */
+  .strength-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 12px; color: var(--text2); }
+  .strength-item::before { content: '✓'; color: #6bffb8; font-weight: 700; flex-shrink: 0; }
+  .flag-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 12px; color: var(--text2); }
+  .flag-item::before { content: '⚠'; color: #ffa96b; flex-shrink: 0; }
+
+  /* ── SUB-SCORE ROW ── */
+  .subscore-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .subscore-row:last-child { border: none; }
+  .subscore-name { font-size: 13px; color: var(--text); width: 200px; flex-shrink: 0; }
+  .subscore-weight { font-family: var(--mono); font-size: 10px; color: var(--text3); width: 30px; }
+  .subscore-track { flex: 1; height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+  .subscore-fill { height: 100%; border-radius: 4px; transition: width .4s ease; }
+  .subscore-val { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text); min-width: 42px; text-align: right; }
+
+  /* ── CHART CONTAINER ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── RUN BUTTON ── */
+  .run-btn {
+    background: var(--accent); color: #000;
+    border: none; padding: 10px 24px; border-radius: 8px;
+    font-family: var(--sans); font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: .02em;
+    transition: opacity .2s, transform .1s;
+  }
+  .run-btn:hover { opacity: .85; }
+  .run-btn:active { transform: scale(.98); }
+  .run-btn-ghost {
+    background: transparent; border: 1px solid var(--border2);
+    color: var(--text2); padding: 8px 18px; border-radius: 8px;
+    font-family: var(--sans); font-size: 12px; cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .run-btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">CLAD</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('pipeline')">Pipeline <span class="nav-badge">LIVE</span></button>
+    <button class="nav-tab" onclick="showTab('cladscore')">CladScore model</button>
+    <button class="nav-tab" onclick="showTab('pricing')">Pricing engine</button>
+    <button class="nav-tab" onclick="showTab('data')">Training data</button>
+    <button class="nav-tab" onclick="showTab('trigger')">Trigger service</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 1: PIPELINE
+══════════════════════════════════════════════════════ -->
+<div id="tab-pipeline" class="section active">
+  <div class="page-title">Model pipeline explainer</div>
+  <div class="page-sub">Adjust any worker signal and watch every layer of the model update in real time</div>
+
+  <div class="grid2" style="gap:1.5rem">
+
+    <!-- LEFT: INPUTS -->
+    <div class="card">
+      <div class="section-label">Worker profile inputs</div>
+
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Active days (last 30)</span><span class="input-val" id="p-active-out">22</span></div>
+        <input type="range" min="0" max="30" value="22" id="p-active" step="1" oninput="sync('p-active','p-active-out','',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Avg deliveries/day</span><span class="input-val" id="p-del-out">14</span></div>
+        <input type="range" min="1" max="30" value="14" id="p-del" step="1" oninput="sync('p-del','p-del-out','',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">GPS consistency</span><span class="input-val" id="p-gps-out">88%</span></div>
+        <input type="range" min="0" max="100" value="88" id="p-gps" step="1" oninput="sync('p-gps','p-gps-out','%',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Zone adherence rate</span><span class="input-val" id="p-zone-adh-out">90%</span></div>
+        <input type="range" min="0" max="100" value="90" id="p-zone-adh" step="1" oninput="sync('p-zone-adh','p-zone-adh-out','%',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Delivery consistency</span><span class="input-val" id="p-dc-out">0.80</span></div>
+        <input type="range" min="0" max="100" value="80" id="p-dc" step="1" oninput="syncDec('p-dc','p-dc-out');run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Claim-free streak (weeks)</span><span class="input-val" id="p-streak-out">8</span></div>
+        <input type="range" min="0" max="52" value="8" id="p-streak" step="1" oninput="sync('p-streak','p-streak-out','',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Total lifetime claims</span><span class="input-val" id="p-claims-out">1</span></div>
+        <input type="range" min="0" max="15" value="1" id="p-claims" step="1" oninput="sync('p-claims','p-claims-out','',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Fraud flags</span><span class="input-val" id="p-fraud-out">0</span></div>
+        <input type="range" min="0" max="5" value="0" id="p-fraud" step="1" oninput="sync('p-fraud','p-fraud-out','',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Account age (days)</span><span class="input-val" id="p-age-out">180</span></div>
+        <input type="range" min="1" max="730" value="180" id="p-age" step="1" oninput="sync('p-age','p-age-out','',0);run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Avg daily earnings (₹)</span><span class="input-val" id="p-earn-out">₹700</span></div>
+        <input type="range" min="300" max="1200" value="700" id="p-earn" step="10" oninput="document.getElementById('p-earn-out').textContent='₹'+this.value;run()">
+      </div>
+      <div class="input-group">
+        <div class="input-row"><span class="input-label">Past claims count</span><span class="input-val" id="p-past-out">2</span></div>
+        <input type="range" min="0" max="10" value="2" id="p-past" step="1" oninput="sync('p-past','p-past-out','',0);run()">
+      </div>
+      <div class="input-group" style="margin-bottom:.5rem">
+        <div class="input-label" style="margin-bottom:6px">Zone / Pincode</div>
+        <select id="p-zone" onchange="run()">
+          <option value="400001">400001 — Mumbai CST (flood: 0.85, AQI: 145)</option>
+          <option value="560034" selected>560034 — Bangalore HSR (flood: 0.72, AQI: 95)</option>
+          <option value="560038">560038 — Bangalore BTM (flood: 0.45, AQI: 88)</option>
+          <option value="110001">110001 — Delhi Central (flood: 0.30, AQI: 220)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <div class="input-label" style="margin-bottom:6px">Plan tier</div>
+        <select id="p-plan" onchange="run()">
+          <option value="basic">Basic — ₹29 base premium</option>
+          <option value="plus" selected>Plus — ₹49 base premium</option>
+          <option value="pro">Pro — ₹79 base premium</option>
+        </select>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="p-monsoon" onchange="run()">
+        <label for="p-monsoon">Monsoon season active (June–Sep)</label>
+      </div>
+      <div class="checkbox-row" style="margin-top:6px">
+        <input type="checkbox" id="p-pan" checked onchange="run()">
+        <label for="p-pan">PAN verified</label>
+      </div>
+    </div>
+
+    <!-- RIGHT: OUTPUT PIPELINE -->
+    <div style="display:flex;flex-direction:column;gap:1rem">
+
+      <!-- Pipeline flow nodes -->
+      <div class="card">
+        <div class="section-label">Live computation flow</div>
+        <div class="pipeline-flow">
+          <div class="flow-node">
+            <div class="flow-node-title">Worker signals</div>
+            <div class="flow-node-val" id="pf-signals">12</div>
+            <div class="flow-node-sub">input features</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-node-title">CladScore</div>
+            <div class="flow-node-val" id="pf-clad" style="color:var(--accent)">—</div>
+            <div class="flow-node-sub" id="pf-grade">grade —</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-node-title">Zone risk</div>
+            <div class="flow-node-val" id="pf-zone">—</div>
+            <div class="flow-node-sub" id="pf-zone-city">—</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-node-title">Final premium</div>
+            <div class="flow-node-val" id="pf-premium" style="color:var(--accent2)">—</div>
+            <div class="flow-node-sub">per week</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CladScore breakdown -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="section-label" style="margin:0">CladScore breakdown</div>
+          <div id="grade-badge" class="grade-badge grade-a">A</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="flex:1">
+            <div style="font-size:36px;font-weight:700;letter-spacing:-.03em;color:var(--text)" id="cs-score">—</div>
+            <div style="font-size:12px;color:var(--text2)" id="cs-interp">—</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:2px">Payout speed</div>
+            <div class="pill pill-g" id="cs-payout">—</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:6px;margin-bottom:2px">Premium modifier</div>
+            <div class="pill pill-y" id="cs-modifier">×1.0</div>
+          </div>
+        </div>
+        <div id="cs-subscores"></div>
+        <div class="divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Strengths</div>
+            <div id="cs-strengths"></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Flags</div>
+            <div id="cs-flags"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Premium adjustments -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="section-label" style="margin:0">Premium adjustment breakdown</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--accent2)" id="final-prem-label">₹—/wk</div>
+        </div>
+        <div id="prem-adjustments"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 2: CLADSCORE MODEL
+══════════════════════════════════════════════════════ -->
+<div id="tab-cladscore" class="section">
+  <div class="page-title">CladScore — Trust & risk model</div>
+  <div class="page-sub">A 0–100 composite reliability score. Four independently interpretable sub-components, each with actuarially sourced weights.</div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="card">
+      <div class="section-label">Sub-model architecture</div>
+      <div class="subscore-row">
+        <div class="subscore-name"><strong>C1</strong> — Delivery consistency</div>
+        <div class="subscore-weight">30%</div>
+        <div class="subscore-track"><div class="subscore-fill" id="cs2-c1" style="background:#e8ff6b;width:0%"></div></div>
+        <div class="subscore-val" id="cs2-c1-val">—</div>
+      </div>
+      <div class="subscore-row">
+        <div class="subscore-name"><strong>C2</strong> — Location honesty</div>
+        <div class="subscore-weight">25%</div>
+        <div class="subscore-track"><div class="subscore-fill" id="cs2-c2" style="background:#6bffb8;width:0%"></div></div>
+        <div class="subscore-val" id="cs2-c2-val">—</div>
+      </div>
+      <div class="subscore-row">
+        <div class="subscore-name"><strong>C3</strong> — Claim integrity</div>
+        <div class="subscore-weight">25%</div>
+        <div class="subscore-track"><div class="subscore-fill" id="cs2-c3" style="background:#6bb3ff;width:0%"></div></div>
+        <div class="subscore-val" id="cs2-c3-val">—</div>
+      </div>
+      <div class="subscore-row">
+        <div class="subscore-name"><strong>C4</strong> — Zone risk inverse</div>
+        <div class="subscore-weight">20%</div>
+        <div class="subscore-track"><div class="subscore-fill" id="cs2-c4" style="background:#ffa96b;width:0%"></div></div>
+        <div class="subscore-val" id="cs2-c4-val">—</div>
+      </div>
+      <div class="divider"></div>
+      <div class="subscore-row" style="border:none;padding-top:6px">
+        <div class="subscore-name" style="font-weight:700">Total CladScore</div>
+        <div class="subscore-weight" style="color:transparent">—</div>
+        <div class="subscore-track"><div class="subscore-fill" id="cs2-total" style="background:var(--accent);width:0%"></div></div>
+        <div class="subscore-val" style="color:var(--accent)" id="cs2-total-val">—</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="card">
+        <div class="section-label">Grade → payout speed mapping</div>
+        <table class="data-table">
+          <thead><tr><th>Grade</th><th>Score range</th><th>Payout speed</th><th>Premium mod</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pill pill-y">A+</span></td><td>85–100</td><td>Instant</td><td>×0.68</td></tr>
+            <tr><td><span class="pill pill-g">A</span></td><td>75–84</td><td>2hr auto</td><td>×0.80</td></tr>
+            <tr><td><span class="pill pill-b">B+</span></td><td>62–74</td><td>2hr auto</td><td>×0.92</td></tr>
+            <tr><td><span style="font-family:var(--mono);font-size:10px;color:var(--text2)">B</span></td><td>50–61</td><td>6hr hold</td><td>×1.00</td></tr>
+            <tr><td><span style="font-family:var(--mono);font-size:10px;color:#ffa96b">C</span></td><td>35–49</td><td>24hr review</td><td>×1.15</td></tr>
+            <tr><td><span class="pill pill-r">D</span></td><td>0–34</td><td>24hr review</td><td>×1.40</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="section-label">New account gating rules</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="trigger-status" style="background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.15)">
+            <div class="trigger-dot" style="background:#ff6b6b"></div>
+            <div class="trigger-label" style="font-size:12px;color:var(--text2)">Account &lt; 21 days → score <strong style="color:var(--text)">capped at 65</strong></div>
+          </div>
+          <div class="trigger-status" style="background:rgba(255,169,107,.06);border:1px solid rgba(255,169,107,.15)">
+            <div class="trigger-dot" style="background:#ffa96b"></div>
+            <div class="trigger-label" style="font-size:12px;color:var(--text2)">Account 21–59 days → score <strong style="color:var(--text)">capped at 80</strong></div>
+          </div>
+          <div class="trigger-status" style="background:rgba(107,255,184,.06);border:1px solid rgba(107,255,184,.15)">
+            <div class="trigger-dot" style="background:#6bffb8"></div>
+            <div class="trigger-label" style="font-size:12px;color:var(--text2)">Account ≥ 60 days → <strong style="color:var(--text)">uncapped</strong></div>
+          </div>
+          <div class="trigger-status" style="background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.15)">
+            <div class="trigger-dot" style="background:#ff6b6b"></div>
+            <div class="trigger-label" style="font-size:12px;color:var(--text2)">PAN unverified → location honesty <strong style="color:var(--text)">capped at 40%</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Feature importance (actuarial weights)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:.5rem">
+      <div>
+        <div class="feat-row"><div class="feat-name">Active days / 30</div><div class="feat-track"><div class="feat-fill" style="width:40%"></div></div><div class="feat-pct">40%</div></div>
+        <div class="feat-row"><div class="feat-name">Deliveries/day</div><div class="feat-track"><div class="feat-fill" style="width:30%"></div></div><div class="feat-pct">30%</div></div>
+        <div class="feat-row"><div class="feat-name">Delivery streak</div><div class="feat-track"><div class="feat-fill" style="width:15%"></div></div><div class="feat-pct">15%</div></div>
+        <div class="feat-row"><div class="feat-name">Platform tenure</div><div class="feat-track"><div class="feat-fill" style="width:15%"></div></div><div class="feat-pct">15%</div></div>
+      </div>
+      <div>
+        <div class="feat-row"><div class="feat-name">GPS consistency</div><div class="feat-track"><div class="feat-fill" style="width:35%;background:var(--accent2)"></div></div><div class="feat-pct">35%</div></div>
+        <div class="feat-row"><div class="feat-name">Zone adherence</div><div class="feat-track"><div class="feat-fill" style="width:35%;background:var(--accent2)"></div></div><div class="feat-pct">35%</div></div>
+        <div class="feat-row"><div class="feat-name">Cell tower match</div><div class="feat-track"><div class="feat-fill" style="width:30%;background:var(--accent2)"></div></div><div class="feat-pct">30%</div></div>
+        <div class="feat-row"><div class="feat-name">Fraud flags (–25pt each)</div><div class="feat-track"><div class="feat-fill" style="width:100%;background:#ff6b6b"></div></div><div class="feat-pct">penalty</div></div>
+        <div class="feat-row"><div class="feat-name">Claim-free streak (+2pt/wk)</div><div class="feat-track"><div class="feat-fill" style="width:15%;background:#6bb3ff"></div></div><div class="feat-pct">+15 max</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 3: PRICING ENGINE
+══════════════════════════════════════════════════════ -->
+<div id="tab-pricing" class="section">
+  <div class="page-title">Pricing engine</div>
+  <div class="page-sub">Actuarially sourced adjustment weights — each traceable to IMD / AQICN / platform data. Designed to swap in XGBoost-trained weights as claims data accumulates.</div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="card">
+      <div class="section-label">Adjustment weight schema</div>
+      <table class="data-table">
+        <thead><tr><th>Factor</th><th>Weight</th><th>CI low</th><th>CI high</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Flood risk multiplier</td><td>×18.0</td><td>14.0</td><td>23.0</td><td>IMD 2000–2023</td></tr>
+          <tr><td>AQI multiplier</td><td>×6.0</td><td>4.0</td><td>9.0</td><td>AQICN annual means</td></tr>
+          <tr><td>Disruption freq. mult.</td><td>×2.5</td><td>1.8</td><td>3.4</td><td>Platform delivery logs</td></tr>
+          <tr><td>CladScore discount max</td><td>₹12</td><td>8</td><td>15</td><td>Claims vs score regression</td></tr>
+          <tr><td>New user surcharge max</td><td>₹5</td><td>3</td><td>7</td><td>90-day claims spike data</td></tr>
+          <tr><td>No-claim streak discount</td><td>₹8</td><td>5</td><td>11</td><td>No-claims bonus standard</td></tr>
+          <tr><td>Monsoon surcharge</td><td>₹8</td><td>6</td><td>11</td><td>Seasonal claims 2019–2023</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="section-label">compute_dynamic_payout() — trigger payout formula</div>
+      <div class="log-box" style="max-height:none;line-height:2">
+        <div><span class="log-b">payout</span> = base_earning</div>
+        <div style="padding-left:1.5rem">× (rain_intensity / 10) <span class="log-y">← intensity_factor</span></div>
+        <div style="padding-left:1.5rem">× (duration / 60) <span class="log-y">← duration_factor</span></div>
+        <div style="padding-left:1.5rem">× plan_multiplier <span class="log-y">← 0.4 / 0.6 / 0.8</span></div>
+        <div style="margin-top:10px"><span class="log-b">premium</span> = base + Σ adjustments</div>
+        <div style="padding-left:1.5rem"><span class="log-g">+ flood_risk × 18</span></div>
+        <div style="padding-left:1.5rem"><span class="log-g">+ aqi_index × 6</span></div>
+        <div style="padding-left:1.5rem"><span class="log-g">+ disruption_freq × 2.5</span></div>
+        <div style="padding-left:1.5rem"><span class="log-r">– clad_score_discount</span></div>
+        <div style="padding-left:1.5rem"><span class="log-g">+ new_user_surcharge</span></div>
+        <div style="padding-left:1.5rem"><span class="log-r">– streak_discount</span></div>
+        <div style="padding-left:1.5rem"><span class="log-g">+ monsoon_surcharge (if Jun–Sep)</span></div>
+        <div style="margin-top:10px"><span class="log-b">final</span> = max(base, computed)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label" style="margin-bottom:1rem">Live premium simulator — rain trigger scenario</div>
+    <div class="grid3" style="margin-bottom:1.5rem">
+      <div>
+        <div class="input-row"><span class="input-label">Rain intensity (0–10)</span><span class="input-val" id="rain-int-out">9.2</span></div>
+        <input type="range" min="0" max="10" value="9.2" step="0.1" id="rain-int" oninput="syncFloat('rain-int','rain-int-out',1);simPayout()">
+      </div>
+      <div>
+        <div class="input-row"><span class="input-label">Rain duration (min)</span><span class="input-val" id="rain-dur-out">52</span></div>
+        <input type="range" min="5" max="120" value="52" step="1" id="rain-dur" oninput="sync('rain-dur','rain-dur-out','',0);simPayout()">
+      </div>
+      <div>
+        <div class="input-row"><span class="input-label">Avg daily earning (₹)</span><span class="input-val" id="rain-earn-out">₹700</span></div>
+        <input type="range" min="300" max="1200" value="700" step="10" id="rain-earn" oninput="document.getElementById('rain-earn-out').textContent='₹'+this.value;simPayout()">
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="metric-card">
+        <div class="metric-label">Intensity factor</div>
+        <div class="metric-val" id="sim-intensity">—</div>
+        <div class="metric-sub">rain / 10</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Duration factor</div>
+        <div class="metric-val" id="sim-duration">—</div>
+        <div class="metric-sub">minutes / 60</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Trigger payout</div>
+        <div class="metric-val" id="sim-payout" style="color:var(--accent2)">—</div>
+        <div class="metric-sub" id="sim-plan-lbl">plus plan (×0.6)</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem">
+      <div class="input-row" style="margin-bottom:6px"><span class="input-label">Plan for payout</span></div>
+      <select id="sim-plan" onchange="simPayout()" style="width:auto;min-width:200px">
+        <option value="0.4">Basic (×0.4)</option>
+        <option value="0.6" selected>Plus (×0.6)</option>
+        <option value="0.8">Pro (×0.8)</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 4: TRAINING DATA
+══════════════════════════════════════════════════════ -->
+<div id="tab-data" class="section">
+  <div class="page-title">Training data</div>
+  <div class="page-sub">8,000 synthetic samples generated from real IMD, AQICN, and platform disruption data. Used to learn the `optimal_premium` target.</div>
+
+  <div class="grid4" style="margin-bottom:1.5rem">
+    <div class="metric-card">
+      <div class="metric-label">Total samples</div>
+      <div class="metric-val">8,000</div>
+      <div class="metric-sub">generate_training_data.py</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Features</div>
+      <div class="metric-val">17</div>
+      <div class="metric-sub">input + derived</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Monsoon samples</div>
+      <div class="metric-val">2,670</div>
+      <div class="metric-sub">avg payout ₹503</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Non-monsoon avg payout</div>
+      <div class="metric-val">₹200</div>
+      <div class="metric-sub">vs ₹503 monsoon (2.5×)</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">Feature columns</div>
+      <table class="data-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>base_premium</td><td><span class="pill pill-b">int</span></td><td>Always 49 (Plus plan)</td></tr>
+          <tr><td>account_age_days</td><td><span class="pill pill-b">int</span></td><td>Exponential dist, mean 180</td></tr>
+          <tr><td>clad_score</td><td><span class="pill pill-y">float</span></td><td>Beta(5,3)×100, range 10–100</td></tr>
+          <tr><td>delivery_consistency</td><td><span class="pill pill-y">float</span></td><td>Beta(6,2), mean 0.75</td></tr>
+          <tr><td>avg_daily_earning</td><td><span class="pill pill-y">float</span></td><td>Normal(700,120), clip 300–1200</td></tr>
+          <tr><td>claim_free_weeks</td><td><span class="pill pill-b">int</span></td><td>Exponential, mean 6</td></tr>
+          <tr><td>past_claims_count</td><td><span class="pill pill-b">int</span></td><td>Poisson(λ=2)</td></tr>
+          <tr><td>is_monsoon</td><td><span class="pill pill-g">bool</span></td><td>Month in [6,7,8,9]</td></tr>
+          <tr><td>is_aqi_season</td><td><span class="pill pill-g">bool</span></td><td>Month in [10,11,12,1,2]</td></tr>
+          <tr><td>flood_frequency</td><td><span class="pill pill-y">float</span></td><td>Zone: 0.30, 0.45, 0.72, 0.85</td></tr>
+          <tr><td>avg_rainfall_mm</td><td><span class="pill pill-y">float</span></td><td>720, 940, 970, 2400</td></tr>
+          <tr><td>aqi_annual_avg</td><td><span class="pill pill-y">float</span></td><td>88, 95, 145, 220</td></tr>
+          <tr><td>waterlogging_score</td><td><span class="pill pill-y">float</span></td><td>0.28–0.80</td></tr>
+          <tr><td>disruption_days_per_year</td><td><span class="pill pill-y">float</span></td><td>19–38</td></tr>
+          <tr><td>weekly_disruption_prob</td><td><span class="pill pill-y">float</span></td><td>disruption_days/365×7 (×2.5 monsoon)</td></tr>
+          <tr><td>expected_weekly_payout</td><td><span class="pill pill-y">float</span></td><td>weekly_prob × daily_earn × 0.5</td></tr>
+          <tr><td><strong>optimal_premium</strong></td><td><span class="pill pill-r">TARGET</span></td><td>expected_payout × 1.35, clip ₹20–₹120</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="card">
+        <div class="section-label" style="margin-bottom:12px">Zone risk profiles (zone_risk.py)</div>
+        <table class="data-table">
+          <thead><tr><th>Pincode</th><th>Flood freq</th><th>Rainfall mm</th><th>AQI avg</th><th>Disruption days</th></tr></thead>
+          <tbody>
+            <tr><td>560034</td><td>0.72</td><td>970</td><td>95</td><td>28</td></tr>
+            <tr><td>560038</td><td>0.45</td><td>940</td><td>88</td><td>19</td></tr>
+            <tr><td>400001</td><td>0.85</td><td>2400</td><td>145</td><td>38</td></tr>
+            <tr><td>110001</td><td>0.30</td><td>720</td><td>220</td><td>35</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="section-label" style="margin-bottom:8px">Monsoon multiplier effect</div>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="chart-monsoon"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label" style="margin-bottom:8px">Premium distribution</div>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="chart-premium"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 5: TRIGGER SERVICE
+══════════════════════════════════════════════════════ -->
+<div id="tab-trigger" class="section">
+  <div class="page-title">Trigger service</div>
+  <div class="page-sub">real_trigger_service.py — detects weather conditions and auto-fires claims for eligible workers. Currently simulates live API calls.</div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="card">
+        <div class="section-label">Trigger conditions (rain)</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div class="input-row"><span class="input-label">Rain intensity (simulated)</span><span class="input-val" id="trig-int-out">9.2</span></div>
+            <input type="range" min="0" max="10" value="9.2" step="0.1" id="trig-int" oninput="syncFloat('trig-int','trig-int-out',1);updateTrigger()">
+          </div>
+          <div>
+            <div class="input-row"><span class="input-label">Duration (minutes)</span><span class="input-val" id="trig-dur-out">52</span></div>
+            <input type="range" min="0" max="120" value="52" step="1" id="trig-dur" oninput="sync('trig-dur','trig-dur-out','',0);updateTrigger()">
+          </div>
+          <div>
+            <div class="input-row"><span class="input-label">Workers affected (simulated)</span><span class="input-val" id="trig-workers-out">4</span></div>
+            <input type="range" min="1" max="20" value="4" step="1" id="trig-workers" oninput="sync('trig-workers','trig-workers-out','',0);updateTrigger()">
+          </div>
+          <div>
+            <div class="input-label" style="margin-bottom:6px">Worker avg daily earning (₹)</div>
+            <div class="input-row"><span class="input-label">₹ amount</span><span class="input-val" id="trig-earn-out">₹700</span></div>
+            <input type="range" min="300" max="1200" value="700" step="10" id="trig-earn" oninput="document.getElementById('trig-earn-out').textContent='₹'+this.value;updateTrigger()">
+          </div>
+          <div>
+            <div class="input-label" style="margin-bottom:6px">Plan</div>
+            <select id="trig-plan" onchange="updateTrigger()">
+              <option value="0.4">Basic (×0.4)</option>
+              <option value="0.6" selected>Plus (×0.6)</option>
+              <option value="0.8">Pro (×0.8)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label" style="margin-bottom:10px">Trigger gate status</div>
+        <div id="trig-rain-status" class="trigger-status">
+          <div class="trigger-dot"></div>
+          <div class="trigger-label">—</div>
+        </div>
+        <div id="trig-dur-status" class="trigger-status">
+          <div class="trigger-dot"></div>
+          <div class="trigger-label">—</div>
+        </div>
+        <div id="trig-fire-status" class="trigger-status" style="margin-top:4px">
+          <div class="trigger-dot"></div>
+          <div class="trigger-label" style="font-weight:600">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="grid2" style="gap:.875rem">
+        <div class="metric-card">
+          <div class="metric-label">Per-worker payout</div>
+          <div class="metric-val" id="trig-per-payout" style="color:var(--accent2)">—</div>
+          <div class="metric-sub">if triggered</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total batch payout</div>
+          <div class="metric-val" id="trig-total-payout" style="color:var(--accent)">—</div>
+          <div class="metric-sub" id="trig-worker-count-lbl">for 4 workers</div>
+        </div>
+      </div>
+      <div class="card" style="flex:1">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="section-label" style="margin:0">Execution log</div>
+          <button class="run-btn" onclick="runTriggerSim()">Run simulation</button>
+        </div>
+        <div class="log-box" id="trig-log">
+          <span class="log-b">// Click "Run simulation" to fire the trigger service</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">run_triggers() — source flow</div>
+        <div class="log-box" style="max-height:none">
+          <div><span class="log-b">async</span> <span class="log-g">run_triggers</span>(pincode):</div>
+          <div style="padding-left:1.5rem"><span class="log-y">rain_intensity</span> = <span class="log-r">fetch_weather_api()</span></div>
+          <div style="padding-left:1.5rem"><span class="log-y">duration</span> = <span class="log-r">fetch_weather_api()</span></div>
+          <div style="margin-top:6px;padding-left:1.5rem"><span class="log-b">if</span> rain_intensity &gt; 7.5 <span class="log-b">and</span> duration &gt; 45:</div>
+          <div style="padding-left:3rem">triggers_fired.append(<span class="log-g">"rain"</span>)</div>
+          <div style="padding-left:3rem">amount = <span class="log-r">compute_dynamic_payout</span>(user, data)</div>
+          <div style="padding-left:3rem"><span class="log-b">for</span> worker <span class="log-b">in</span> eligible_workers:</div>
+          <div style="padding-left:4.5rem"><span class="log-r">create_claim</span>(worker, amount)</div>
+          <div style="margin-top:6px"><span class="log-b">return</span> {triggers_fired, claims_created}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const ZONES = {
+  "400001": {city:"Mumbai CST",     flood:0.85, aqi:0.483, disruption:38, rainfall:2400, waterlog:0.80},
+  "560034": {city:"Bangalore HSR",  flood:0.72, aqi:0.317, disruption:28, rainfall:970,  waterlog:0.68},
+  "560038": {city:"Bangalore BTM",  flood:0.45, aqi:0.293, disruption:19, rainfall:940,  waterlog:0.40},
+  "110001": {city:"Delhi Central",  flood:0.30, aqi:0.733, disruption:35, rainfall:720,  waterlog:0.28},
+};
+const BASE_PREM = {basic:29, plus:49, pro:79};
+const PLAN_MULT = {basic:0.4, plus:0.6, pro:0.8};
+
+// ── HELPERS ───────────────────────────────────────────────────
+function sync(id, outId, suffix, dec) {
+  const v = parseFloat(document.getElementById(id).value);
+  document.getElementById(outId).textContent = v.toFixed(dec) + suffix;
+}
+function syncDec(id, outId) {
+  const v = parseInt(document.getElementById(id).value) / 100;
+  document.getElementById(outId).textContent = v.toFixed(2);
+}
+function syncFloat(id, outId, dec) {
+  const v = parseFloat(document.getElementById(id).value);
+  document.getElementById(outId).textContent = v.toFixed(dec);
+}
+function set(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+// ── TAB SWITCHING ─────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const names = ['pipeline','cladscore','pricing','data','trigger'];
+  tabs[names.indexOf(name)].classList.add('active');
+}
+
+// ── CLADSCORE ENGINE ──────────────────────────────────────────
+function computeCladScore(inp) {
+  let strengths = [], flags = [];
+  // C1: Delivery Consistency (30%)
+  const activeRate = clamp(inp.activeDays / 22, 0, 1);
+  const delivRate  = clamp(inp.avgDeliveries / 20, 0, 1);
+  const dcRate     = inp.deliveryConsistency;
+  const c1 = (activeRate*0.40 + delivRate*0.30 + dcRate*0.30) * 100;
+  if(activeRate>0.85) strengths.push(`Works ${inp.activeDays}/30 days consistently`);
+  if(activeRate<0.5)  flags.push('Low activity in last 30 days');
+
+  // C2: Location Honesty (25%)
+  const gps  = inp.gpsConsistency / 100;
+  const zadh = inp.zoneAdherence / 100;
+  const panGate = inp.panVerified ? 1.0 : 0.40;
+  let c2 = (gps*0.50 + zadh*0.50) * panGate * 100;
+  if(gps>0.90) strengths.push('GPS & location signals consistent');
+  if(!inp.panVerified) flags.push('PAN not verified — location honesty capped at 40%');
+  if(zadh<0.70) flags.push('Frequently operates outside registered zone');
+
+  // C3: Claim Integrity (25%)
+  const fraudPenalty = clamp(inp.fraudFlags * 0.25, 0, 1);
+  const approvalRate = inp.totalClaims === 0 ? 0.85 : clamp((inp.totalClaims - inp.fraudFlags) / Math.max(inp.totalClaims,1), 0, 1);
+  const claimBase = approvalRate * (1 - fraudPenalty);
+  const streakBonus = clamp(inp.claimFreeWeeks * 0.02, 0, 0.15);
+  const c3 = clamp((claimBase + streakBonus) * 100, 0, 100);
+  if(inp.claimFreeWeeks>=4) strengths.push(`${inp.claimFreeWeeks}-week claim-free streak`);
+  if(inp.fraudFlags>0) flags.push(`${inp.fraudFlags} fraud flag(s) on record`);
+
+  // C4: Zone Risk Inverse (20%)
+  const zoneNorm = inp.zone.disruption / 52;
+  const c4 = clamp(100 - (zoneNorm*80) - (inp.zone.flood*20), 20, 100);
+  if(inp.zone.flood<0.4) strengths.push('Low flood-risk zone');
+  if(inp.zone.flood>0.7) flags.push('High flood-risk zone — premium adjusted accordingly');
+
+  // Weighted total
+  let total = (c1*0.30) + (c2*0.25) + (c3*0.25) + (c4*0.20);
+  total = clamp(total, 0, 100);
+  if(inp.accountAgeDays < 21) { total = Math.min(total, 65); flags.push('New account — score capped at 65'); }
+  else if(inp.accountAgeDays < 60) { total = Math.min(total, 80); }
+
+  // Grade
+  let grade, payout, rec;
+  if(total>=85){ grade="A+"; payout="Instant"; }
+  else if(total>=75){ grade="A"; payout="2hr auto"; }
+  else if(total>=62){ grade="B+"; payout="2hr auto"; }
+  else if(total>=50){ grade="B"; payout="6hr hold"; }
+  else if(total>=35){ grade="C"; payout="24hr review"; }
+  else { grade="D"; payout="24hr review"; }
+
+  // Premium modifier
+  let modifier;
+  if(total>=50) modifier = 1.0 - ((total-50)/10)*0.04;
+  else modifier = 1.0 + ((50-total)/10)*0.05;
+  modifier = clamp(modifier, 0.65, 1.40);
+
+  return { total:Math.round(total*10)/10, grade, payout, modifier:Math.round(modifier*1000)/1000, c1:Math.round(c1*10)/10, c2:Math.round(c2*10)/10, c3:Math.round(c3*10)/10, c4:Math.round(c4*10)/10, strengths, flags };
+}
+
+// ── PREMIUM ENGINE ────────────────────────────────────────────
+function computePremium(plan, zone, cladScore, accountAgeDays, claimFreeWeeks, monsoon) {
+  const base = BASE_PREM[plan];
+  const adjs = [];
+  adjs.push({name:"Zone flood risk",      desc:zone.city+" — flood "+zone.flood.toFixed(2),              impact:+(zone.flood * 18).toFixed(2),                dir:"inc"});
+  adjs.push({name:"Air quality index",    desc:"AQI index "+zone.aqi.toFixed(3),                          impact:+(zone.aqi * 6).toFixed(2),                   dir:"inc"});
+  adjs.push({name:"Zone disruption rate", desc:zone.disruption+" disruption days/year",                   impact:+((zone.disruption/52)*2.5).toFixed(2),       dir:"inc"});
+  const norm = (cladScore - 50)/50;
+  const cladAdj = -(norm*12);
+  adjs.push({name:"CladScore",            desc:"Score "+cladScore.toFixed(1)+"/100",                     impact:+cladAdj.toFixed(2),                           dir:cladAdj<0?"disc":"inc"});
+  if(accountAgeDays<90){
+    const nu = (1-(accountAgeDays/90))*5;
+    adjs.push({name:"New account surcharge", desc:"Account "+accountAgeDays+"d old",                     impact:+nu.toFixed(2),                                dir:"inc"});
+  }
+  if(claimFreeWeeks>0){
+    const sd = Math.min(1,claimFreeWeeks/12)*8;
+    adjs.push({name:"No-claim streak",     desc:claimFreeWeeks+" claim-free weeks",                      impact:-+sd.toFixed(2),                               dir:"disc"});
+  }
+  if(monsoon){
+    adjs.push({name:"Monsoon surcharge",   desc:"June–Sep peak flood/disruption season",                 impact:8,                                             dir:"inc"});
+  }
+  const total = adjs.reduce((s,a)=>s+a.impact,0);
+  const final = Math.max(base, Math.round((base+total)*100)/100);
+  return {base, final, adjs};
+}
+
+// ── RENDER SUBSCORES ──────────────────────────────────────────
+function renderSubscores(cs) {
+  const rows = [
+    {id:'c1', label:'C1 Delivery consistency', val:cs.c1, color:'#e8ff6b'},
+    {id:'c2', label:'C2 Location honesty',     val:cs.c2, color:'#6bffb8'},
+    {id:'c3', label:'C3 Claim integrity',      val:cs.c3, color:'#6bb3ff'},
+    {id:'c4', label:'C4 Zone risk inverse',    val:cs.c4, color:'#ffa96b'},
+  ];
+  // for pipeline tab
+  rows.forEach(r => {
+    const fill = document.getElementById('cs2-'+r.id);
+    if(fill){ fill.style.width = r.val+'%'; }
+    set('cs2-'+r.id+'-val', r.val.toFixed(1));
+  });
+  const tot = document.getElementById('cs2-total');
+  if(tot){ tot.style.width = cs.total+'%'; }
+  set('cs2-total-val', cs.total.toFixed(1));
+
+  // pipeline tab subscores display
+  const html = rows.map(r=>`
+    <div class="subscore-row">
+      <div class="subscore-name" style="font-size:12px">${r.label}</div>
+      <div class="subscore-track"><div class="subscore-fill" style="background:${r.color};width:${r.val}%"></div></div>
+      <div class="subscore-val">${r.val.toFixed(1)}</div>
+    </div>
+  `).join('');
+  set('cs-subscores', html);
+}
+
+// ── GRADE BADGE ───────────────────────────────────────────────
+function gradeClass(g) {
+  return {'A+':'grade-ap','A':'grade-a','B+':'grade-bp','B':'grade-b','C':'grade-c','D':'grade-d'}[g] || 'grade-b';
+}
+function gradeInterp(g) {
+  return {'A+':'Elite — minimal actuarial risk. Instant payouts.','A':'Trusted — below-average claim probability.','B+':'Good standing — standard auto-approval.','B':'Acceptable — light review on high-value claims.','C':'Watch closely — manual review recommended.','D':'High risk — all claims require manual review.'}[g]||'';
+}
+
+// ── RENDER ADJUSTMENTS ────────────────────────────────────────
+function renderAdjustments(prem) {
+  const maxAbs = Math.max(...prem.adjs.map(a=>Math.abs(a.impact)));
+  const html = prem.adjs.map(a=>{
+    const w = Math.round(Math.abs(a.impact)/Math.max(maxAbs,1)*100);
+    const col = a.dir==='disc'?'#6bffb8':'#ff6b6b';
+    const valStr = (a.dir==='disc'?'<span style="color:#6bffb8">−₹':'<span style="color:#ff6b6b">+₹')+Math.abs(a.impact).toFixed(2)+'</span>';
+    return `<div class="adj-row">
+      <div style="flex:1;min-width:0">
+        <div class="adj-name">${a.name}</div>
+        <div class="adj-desc">${a.desc}</div>
+      </div>
+      <div class="adj-bar-track"><div class="adj-bar-fill" style="width:${w}%;background:${col}"></div></div>
+      <div class="adj-val">${valStr}</div>
+    </div>`;
+  }).join('');
+  set('prem-adjustments', html);
+  set('final-prem-label','₹'+prem.final.toFixed(2)+'/wk');
+}
+
+// ── MAIN COMPUTE ──────────────────────────────────────────────
+function run() {
+  const activeDays        = parseInt(document.getElementById('p-active').value);
+  const avgDeliveries     = parseInt(document.getElementById('p-del').value);
+  const gpsConsistency    = parseInt(document.getElementById('p-gps').value);
+  const zoneAdherence     = parseInt(document.getElementById('p-zone-adh').value);
+  const deliveryConsistency = parseInt(document.getElementById('p-dc').value)/100;
+  const claimFreeWeeks    = parseInt(document.getElementById('p-streak').value);
+  const totalClaims       = parseInt(document.getElementById('p-claims').value);
+  const fraudFlags        = parseInt(document.getElementById('p-fraud').value);
+  const accountAgeDays    = parseInt(document.getElementById('p-age').value);
+  const earn              = parseInt(document.getElementById('p-earn').value);
+  const pastClaims        = parseInt(document.getElementById('p-past').value);
+  const pincode           = document.getElementById('p-zone').value;
+  const plan              = document.getElementById('p-plan').value;
+  const monsoon           = document.getElementById('p-monsoon').checked;
+  const panVerified       = document.getElementById('p-pan').checked;
+  const zone              = ZONES[pincode];
+
+  const cs = computeCladScore({activeDays, avgDeliveries, gpsConsistency, zoneAdherence, deliveryConsistency, claimFreeWeeks, totalClaims, fraudFlags, accountAgeDays, panVerified, zone});
+  const prem = computePremium(plan, zone, cs.total, accountAgeDays, claimFreeWeeks, monsoon);
+
+  // Pipeline flow
+  set('pf-signals', '12');
+  set('pf-clad', cs.total.toFixed(1));
+  set('pf-grade', 'grade ' + cs.grade);
+  set('pf-zone', zone.flood.toFixed(2));
+  set('pf-zone-city', zone.city);
+  set('pf-premium', '₹' + prem.final.toFixed(2));
+
+  // CladScore panel
+  set('cs-score', cs.total.toFixed(1));
+  set('cs-interp', gradeInterp(cs.grade));
+  const badge = document.getElementById('grade-badge');
+  if(badge){ badge.textContent = cs.grade; badge.className = 'grade-badge ' + gradeClass(cs.grade); }
+
+  // Payout pill
+  const pp = document.getElementById('cs-payout');
+  if(pp){ pp.textContent = cs.payout; pp.className = cs.payout==='Instant'?'pill pill-g':cs.payout.includes('2hr')?'pill pill-b':'pill pill-r'; }
+  set('cs-modifier', '×'+cs.modifier.toFixed(3));
+
+  renderSubscores(cs);
+
+  // Strengths / flags
+  set('cs-strengths', cs.strengths.length ? cs.strengths.map(s=>`<div class="strength-item">${s}</div>`).join('') : '<div style="font-size:12px;color:var(--text3)">None</div>');
+  set('cs-flags',     cs.flags.length     ? cs.flags.map(f=>`<div class="flag-item">${f}</div>`).join('')       : '<div style="font-size:12px;color:var(--text3)">None</div>');
+
+  renderAdjustments(prem);
+
+  // Update CladScore tab
+  renderSubscores(cs);
+}
+
+// ── PAYOUT SIMULATOR ─────────────────────────────────────────
+function simPayout() {
+  const intensity = parseFloat(document.getElementById('rain-int').value);
+  const duration  = parseInt(document.getElementById('rain-dur').value);
+  const earn      = parseInt(document.getElementById('rain-earn').value);
+  const mult      = parseFloat(document.getElementById('sim-plan').value);
+  const planLabel = {'0.4':'basic (×0.4)','0.6':'plus (×0.6)','0.8':'pro (×0.8)'}[String(mult)];
+  const iF = intensity/10;
+  const dF = duration/60;
+  const payout = Math.round(earn * iF * dF * mult);
+  set('sim-intensity', iF.toFixed(2));
+  set('sim-duration', dF.toFixed(2));
+  set('sim-payout', '₹'+payout);
+  set('sim-plan-lbl', planLabel+' plan');
+}
+
+// ── TRIGGER SERVICE ───────────────────────────────────────────
+function updateTrigger() {
+  const intensity = parseFloat(document.getElementById('trig-int').value);
+  const duration  = parseInt(document.getElementById('trig-dur').value);
+  const workers   = parseInt(document.getElementById('trig-workers').value);
+  const earn      = parseInt(document.getElementById('trig-earn').value);
+  const mult      = parseFloat(document.getElementById('trig-plan').value);
+  const rainFired = intensity > 7.5;
+  const durFired  = duration > 45;
+  const triggered = rainFired && durFired;
+  const perPayout = Math.round(earn * (intensity/10) * (duration/60) * mult);
+  const totalPayout = perPayout * workers;
+
+  const rainEl = document.getElementById('trig-rain-status');
+  rainEl.innerHTML = `<div class="trigger-dot" style="background:${rainFired?'#6bffb8':'#ff6b6b'}"></div><div class="trigger-label" style="font-size:12px;color:var(--text2)">Rain intensity ${intensity.toFixed(1)} ${rainFired?'<strong style="color:#6bffb8">✓ > 7.5 threshold met</strong>':'<strong style="color:#ff6b6b">✗ below 7.5 threshold</strong>'}</div>`;
+  rainEl.style.background = rainFired?'rgba(107,255,184,.06)':'rgba(255,107,107,.06)';
+  rainEl.style.border = `1px solid ${rainFired?'rgba(107,255,184,.2)':'rgba(255,107,107,.2)'}`;
+
+  const durEl = document.getElementById('trig-dur-status');
+  durEl.innerHTML = `<div class="trigger-dot" style="background:${durFired?'#6bffb8':'#ff6b6b'}"></div><div class="trigger-label" style="font-size:12px;color:var(--text2)">Duration ${duration}min ${durFired?'<strong style="color:#6bffb8">✓ > 45min threshold met</strong>':'<strong style="color:#ff6b6b">✗ below 45min threshold</strong>'}</div>`;
+  durEl.style.background = durFired?'rgba(107,255,184,.06)':'rgba(255,107,107,.06)';
+  durEl.style.border = `1px solid ${durFired?'rgba(107,255,184,.2)':'rgba(255,107,107,.2)'}`;
+
+  const fireEl = document.getElementById('trig-fire-status');
+  fireEl.innerHTML = `<div class="trigger-dot" style="background:${triggered?'#6bffb8':'#555'}"></div><div class="trigger-label" style="font-size:13px;color:${triggered?'#6bffb8':'var(--text2)'}">${triggered?'🚨 TRIGGER FIRES — "rain" event dispatched':'Trigger not fired — conditions not met'}</div>`;
+  fireEl.style.background = triggered?'rgba(107,255,184,.06)':'var(--bg3)';
+  fireEl.style.border = `1px solid ${triggered?'rgba(107,255,184,.2)':'var(--border)'}`;
+
+  set('trig-per-payout', '₹'+perPayout);
+  set('trig-total-payout', '₹'+totalPayout);
+  set('trig-worker-count-lbl', 'for '+workers+' worker'+(workers>1?'s':''));
+}
+
+function runTriggerSim() {
+  const intensity = parseFloat(document.getElementById('trig-int').value);
+  const duration  = parseInt(document.getElementById('trig-dur').value);
+  const workers   = parseInt(document.getElementById('trig-workers').value);
+  const earn      = parseInt(document.getElementById('trig-earn').value);
+  const mult      = parseFloat(document.getElementById('trig-plan').value);
+  const planName  = {'0.4':'basic','0.6':'plus','0.8':'pro'}[String(mult)];
+  const triggered = intensity>7.5 && duration>45;
+  const payout    = Math.round(earn * (intensity/10) * (duration/60) * mult);
+  const ts = new Date().toLocaleTimeString();
+  const log = document.getElementById('trig-log');
+  let lines = '';
+  lines += `<div><span class="log-b">[${ts}]</span> run_triggers(pincode) called</div>`;
+  lines += `<div style="padding-left:1rem"><span class="log-y">rain_intensity</span> = ${intensity.toFixed(1)} | <span class="log-y">duration</span> = ${duration}min</div>`;
+  if(triggered){
+    lines += `<div style="padding-left:1rem"><span class="log-g">✓ Condition met: rain > 7.5 AND duration > 45</span></div>`;
+    lines += `<div style="padding-left:1rem"><span class="log-y">trigger</span> = <span class="log-g">"rain"</span> appended</div>`;
+    lines += `<div style="padding-left:1rem"><span class="log-y">amount</span> = compute_dynamic_payout() → <span class="log-g">₹${payout}</span></div>`;
+    for(let i=0;i<workers;i++){
+      lines += `<div style="padding-left:1rem"><span class="log-b">claim #${i+1}</span> created → worker_${i+1}, ₹${payout}, status=<span class="log-g">approved</span></div>`;
+    }
+    lines += `<div style="margin-top:4px"><span class="log-g">✓ Completed: ${workers} claim(s), total ₹${payout*workers}</span></div>`;
+  } else {
+    lines += `<div style="padding-left:1rem"><span class="log-r">✗ Condition not met — no trigger fired</span></div>`;
+    lines += `<div style="padding-left:1rem"><span class="log-r">  intensity ${intensity.toFixed(1)} ${intensity>7.5?'✓':'✗ (need >7.5)'} | duration ${duration}min ${duration>45?'✓':'✗ (need >45)'}</span></div>`;
+    lines += `<div><span class="log-b">return</span> {triggers_fired: [], claims_created: []}</div>`;
+  }
+  log.innerHTML = lines + (log.innerHTML !== '<span class="log-b">// Click "Run simulation" to fire the trigger service</span>' ? '<div style="border-top:1px solid var(--border);margin-top:6px"></div>'+log.innerHTML : '');
+}
+
+// ── CHARTS ────────────────────────────────────────────────────
+function initCharts() {
+  new Chart(document.getElementById('chart-monsoon'), {
+    type: 'bar',
+    data: {
+      labels: ['Non-monsoon', 'Monsoon'],
+      datasets: [{
+        label: 'Avg expected payout (₹)',
+        data: [200, 503],
+        backgroundColor: ['rgba(107,179,255,0.6)','rgba(232,255,107,0.6)'],
+        borderColor: ['#6bb3ff','#e8ff6b'],
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: {display:false} },
+      scales: {
+        x: { ticks:{color:'#555',font:{size:11}}, grid:{color:'rgba(255,255,255,0.04)'} },
+        y: { ticks:{color:'#555',font:{size:11},callback:v=>'₹'+v}, grid:{color:'rgba(255,255,255,0.04)'} }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('chart-premium'), {
+    type: 'bar',
+    data: {
+      labels: ['₹20–40','₹40–60','₹60–80','₹80–100','₹100–120'],
+      datasets: [{
+        label: 'Sample count',
+        data: [12, 89, 310, 890, 6699],
+        backgroundColor: 'rgba(107,255,184,0.5)',
+        borderColor: '#6bffb8',
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: {display:false} },
+      scales: {
+        x: { ticks:{color:'#555',font:{size:11}}, grid:{display:false} },
+        y: { ticks:{color:'#555',font:{size:11}}, grid:{color:'rgba(255,255,255,0.04)'} }
+      }
+    }
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+run();
+simPayout();
+updateTrigger();
+initCharts();
+</script>
+</body>
+</html>

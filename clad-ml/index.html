@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Clad — Gig Worker Insurance</title>
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#111110;--s2:#1a1a18;--s3:#242422;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);--b3:rgba(255,255,255,0.20);
+  --t1:#F2EFE8;--t2:rgba(242,239,232,0.55);--t3:rgba(242,239,232,0.28);--t4:rgba(242,239,232,0.12);
+  --green:#00E676;--gd:rgba(0,230,118,0.10);--gb:rgba(0,230,118,0.22);
+  --amber:#FFB300;--ad:rgba(255,179,0,0.10);--ab:rgba(255,179,0,0.25);
+  --red:#FF5252;--rd:rgba(255,82,82,0.10);
+  --blue:#448AFF;--bd:rgba(68,138,255,0.10);
+  --r-sm:12px;--r-md:18px;--r-lg:24px;--r-xl:32px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#050505}
+body{display:flex;align-items:center;justify-content:center;font-family:'Cabinet Grotesk',sans-serif}
+
+.shell{
+  width:min(390px,100vw);height:min(844px,100vh);
+  background:var(--bg);border-radius:clamp(0px,5vw,52px);
+  overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.08),0 40px 100px rgba(0,0,0,0.8),0 0 80px rgba(0,230,118,0.03);
+}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;background:var(--bg)}
+.screen::-webkit-scrollbar{display:none}
+.screen{opacity:0;transform:translateX(30px);transition:opacity .32s cubic-bezier(.16,1,.3,1),transform .32s cubic-bezier(.16,1,.3,1)}
+.screen.active{opacity:1;transform:translateX(0)}
+.screen.exit-left{opacity:0;transform:translateX(-30px);pointer-events:none}
+.shell::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:99;opacity:.4}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:16px 28px 8px;font-size:12px;font-weight:700;color:var(--t2);position:sticky;top:0;z-index:10;background:linear-gradient(to bottom,var(--bg) 70%,transparent)}
+.display{font-family:'Instrument Serif',serif;font-style:italic}
+.glow-green{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,0.12),transparent 70%);pointer-events:none;filter:blur(40px)}
+.glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:var(--r-lg)}
+.btn{width:100%;padding:17px;border:none;border-radius:16px;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:-.01em;position:relative;overflow:hidden;transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s ease,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-green{background:linear-gradient(135deg,#00E676,#00C853);color:#080808;box-shadow:0 8px 32px rgba(0,230,118,0.3)}
+.btn-white{background:var(--t1);color:#080808;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--t2)}
+.inp{width:100%;padding:16px 18px;background:var(--s2);border:1.5px solid var(--b1);border-radius:14px;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:500;color:var(--t1);outline:none;transition:border-color .2s,background .2s;-webkit-appearance:none}
+.inp:focus{border-color:var(--green);background:var(--s3)}
+.inp::placeholder{color:var(--t3)}
+.lbl{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:block}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.tag-green{background:var(--gd);color:var(--green);border:1px solid var(--gb)}
+.tag-amber{background:var(--ad);color:var(--amber);border:1px solid var(--ab)}
+.tag-red{background:var(--rd);color:var(--red)}
+.tag-blue{background:var(--bd);color:var(--blue)}
+.tag-dim{background:var(--s2);color:var(--t2);border:1px solid var(--b1)}
+.steps{display:flex;gap:5px;align-items:center;padding:8px 28px}
+.sdot{width:6px;height:6px;border-radius:3px;background:var(--b2);transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.sdot.on{background:var(--green);width:20px;box-shadow:0 0 8px var(--green)}
+.pbar{height:3px;background:var(--b1);border-radius:2px;overflow:hidden}
+.pfill{height:100%;border-radius:2px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.bnav{position:sticky;bottom:0;background:rgba(8,8,8,0.92);backdrop-filter:blur(30px);border-top:1px solid var(--b1);display:grid;grid-template-columns:1fr 1fr 1fr;padding:12px 0 28px;z-index:20}
+.ni{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.ni:active{transform:scale(.9)}
+.ni-icon{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .2s}
+.ni.on .ni-icon{background:var(--gd)}
+.ni-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase}
+.ni.on .ni-lbl{color:var(--green)}
+.plan-card{border-radius:20px;padding:20px;cursor:pointer;border:1.5px solid var(--b1);transition:transform .2s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.plan-card:hover{transform:translateY(-2px)}
+.plan-card.sel-green{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset,0 8px 32px rgba(0,230,118,.15)}
+.plan-card.sel-white{border-color:var(--t1);box-shadow:0 0 0 1px var(--t1) inset,0 8px 32px rgba(255,255,255,.1)}
+.plan-card.sel-amber{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset,0 8px 32px rgba(255,179,0,.15)}
+.zone-chip{padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:12px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);text-align:center}
+.zone-chip.on{background:var(--gd);border-color:var(--green);color:var(--green);transform:scale(1.05)}
+.check-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b1)}
+.check-item:last-child{border-bottom:none}
+.mpill{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px;text-align:center}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(242,239,232,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.err-toast{position:absolute;top:80px;left:16px;right:16px;background:rgba(255,82,82,0.15);border:1px solid rgba(255,82,82,0.3);border-radius:14px;padding:12px 16px;font-size:13px;color:var(--red);font-weight:600;z-index:200;text-align:center;display:none}
+.err-toast.show{display:block;animation:fadeUp .3s ease}
+.spinner{width:20px;height:20px;border:2px solid rgba(8,8,8,0.2);border-top-color:#080808;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+.spinner-w{border-color:rgba(255,255,255,0.2);border-top-color:var(--green)}
+.shimmer{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.ring-progress{stroke-dasharray:251;stroke-dashoffset:251;animation:ringFill 1.2s cubic-bezier(.34,1.56,.64,1) .4s forwards;transform:rotate(-90deg);transform-origin:50px 50px}
+.check-path{stroke-dasharray:55;stroke-dashoffset:55;animation:checkDraw .45s cubic-bezier(.16,1,.3,1) .3s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleSpring{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(0,230,118,.3)}50%{box-shadow:0 0 40px rgba(0,230,118,.6),0 0 80px rgba(0,230,118,.2)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes checkDraw{from{stroke-dashoffset:55}to{stroke-dashoffset:0}}
+@keyframes ringFill{from{stroke-dashoffset:251}to{stroke-dashoffset:var(--end)}}
+@keyframes rain{0%{transform:translateY(-10px);opacity:0}15%{opacity:.8}85%{opacity:.8}100%{transform:translateY(40px);opacity:0}}
+@keyframes countUp{from{opacity:0;transform:translateY(10px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes slideInRow{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes alertRing{0%{box-shadow:0 0 0 0 rgba(255,179,0,.5)}70%{box-shadow:0 0 0 16px rgba(255,179,0,0)}100%{box-shadow:0 0 0 0 rgba(255,179,0,0)}}
+.alert-pulse{animation:alertRing 2s ease-out infinite}
+.fu1{animation:fadeUp .4s .05s cubic-bezier(.16,1,.3,1) both}
+.fu2{animation:fadeUp .4s .12s cubic-bezier(.16,1,.3,1) both}
+.fu3{animation:fadeUp .4s .19s cubic-bezier(.16,1,.3,1) both}
+.fu4{animation:fadeUp .4s .26s cubic-bezier(.16,1,.3,1) both}
+.fu5{animation:fadeUp .4s .33s cubic-bezier(.16,1,.3,1) both}
+.fu6{animation:fadeUp .4s .40s cubic-bezier(.16,1,.3,1) both}
+</style>
+</head>
+<body>
+<div class="shell" id="root"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const API = "http://127.0.0.1:8000";
+
+// ═══════════════════════════════════════════════════════════
+// STATE — single source of truth
+// ═══════════════════════════════════════════════════════════
+let S = {
+  screen: 'splash', tab: 'home',
+  // Onboarding inputs
+  name: '', phone: '', pan: '', platform: 'Zepto',
+  selectedPlan: 1, selectedZone: 'Koramangala', pincode: '560034',
+  // Backend data
+  worker: null,
+  policy: null,
+  premiumData: null,
+  triggerResult: null,
+  latestClaim: null,
+  claimsHistory: [],
+  // Derived
+  cladScore: 72, cladGrade: 'B+', plan: 'plus',
+  avgDailyEarning: 700,
+  loading: false,
+    falseClaims: 0,
+};
+
+const ZONE_PINCODES = {
+  'Koramangala':'560034','Indiranagar':'560038','HSR Layout':'560102',
+  'Whitefield':'560066','JP Nagar':'560078','Electronic City':'560100'
+};
+
+const R = document.getElementById('root');
+let currentEl = null;
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+const initials = n => n ? n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : 'U';
+const planLabel = p => ({basic:'Clad Basic',plus:'Clad Plus',pro:'Clad Pro'}[p]||'Clad Plus');
+const planCap   = p => ({basic:'₹800',plus:'₹1,500',pro:'₹2,500'}[p]||'₹1,500');
+const planSpeed = p => ({basic:'24hr',plus:'2hr',pro:'Instant'}[p]||'2hr');
+const planCost  = p => ({basic:'₹29',plus:'₹49',pro:'₹79'}[p]||'₹49');
+const planRate  = p => ({basic:0.4,plus:0.6,pro:0.8}[p]||0.6);
+const scoreOff  = s => 251 - (251*(s/100));
+const scoreLbl  = s => s>=80?'Excellent':s>=60?'Good':s>=40?'Fair':'Building';
+const fmt       = n => `₹${Math.round(n).toLocaleString('en-IN')}`;
+const now       = () => { const d=new Date(); return `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`; };
+
+function showErr(el, msg) {
+  let t = el.querySelector('.err-toast');
+  if(!t){ t=document.createElement('div'); t.className='err-toast'; el.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// API CALLS — all real backend endpoints
+// ═══════════════════════════════════════════════════════════
+async function apiPost(path, body) {
+  const res = await fetch(`${API}${path}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  if(!res.ok) { const e=await res.json().catch(()=>{}); throw new Error(e?.detail||`HTTP ${res.status}`); }
+  return res.json();
+}
+async function apiGet(path) {
+  const res = await fetch(`${API}${path}`);
+  if(!res.ok) { const e=await res.json().catch(()=>{}); throw new Error(e?.detail||`HTTP ${res.status}`); }
+  return res.json();
+}
+
+// Step 1 — Register
+async function doRegister(name, phone) {
+  const data = await apiPost('/register', {
+    name, pincode: S.pincode,
+    plan: ['basic','plus','pro'][S.selectedPlan],
+    account_age_days: 180,
+    delivery_consistency: 0.88,
+    avg_daily_earning: 720,
+    claim_free_weeks: 8,
+    past_claims_count: 1,
+    location_honesty: 0.90,
+    claim_history_score: 0.95,
+    fraudulent_flags: 0,
+  });
+  S.worker = data.user || data;
+  if(S.worker.avg_daily_earning) S.avgDailyEarning = S.worker.avg_daily_earning;
+  return data;
+}
+
+// Step 2 — Create Policy
+async function doCreatePolicy() {
+  const plan = ['basic','plus','pro'][S.selectedPlan];
+  const data = await apiPost('/policy/create', { name: S.name, plan });
+  S.policy = data.policy || data;
+  S.plan = plan;
+  return data;
+}
+
+// Step 3 — Get ML Premium
+async function doGetPremium() {
+  const data = await apiPost('/premium', { name: S.name, month: new Date().getMonth()+1 });
+  S.premiumData = data;
+  S.cladScore = data.clad_score || S.cladScore;
+  S.cladGrade = data.clad_grade || S.cladGrade;
+  return data;
+}
+
+// Step 4 — Run Triggers
+async function doRunTriggers() {
+  const data = await apiGet(`/trigger/check?pincode=${S.pincode}`);
+  S.triggerResult = data;
+  // Pull latest auto-created claim
+  if(data.claims_created && data.claims_created.length > 0) {
+    S.latestClaim = data.claims_created[data.claims_created.length - 1];
+  }
+  return data;
+}
+
+// Step 5 — Manual Claim
+async function doManualClaim(amount, reason) {
+  const data = await apiPost('/claims/create', { user: S.name, amount, reason });
+  S.latestClaim = data.claim || data;
+  return data;
+}
+
+// Load all claims for user
+async function loadClaims() {
+  try {
+    const data = await apiGet(`/claims/${encodeURIComponent(S.name)}`);
+    S.claimsHistory = data.claims || [];
+    if(S.claimsHistory.length>0 && !S.latestClaim)
+      S.latestClaim = S.claimsHistory[S.claimsHistory.length-1];
+  } catch(e) { console.warn('loadClaims:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ROUTER
+// ═══════════════════════════════════════════════════════════
+function go(name) {
+  if(currentEl) {
+    currentEl.classList.remove('active');
+    currentEl.classList.add('exit-left');
+    const d=currentEl; setTimeout(()=>d.remove(),350);
+  }
+  S.screen = name;
+  const el = SCREENS[name]?.();
+  if(!el) return;
+  R.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));
+  currentEl = el;
+}
+
+function tabTo(t) {
+  S.tab = t;
+  go({home:'home',policy:'policy',profile:'profile'}[t]||'home');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════════════════
+function sbar() {
+  return `<div class="sbar"><span>${now()}</span><span style="font-size:11px;display:flex;gap:5px;align-items:center"><span>●●●●</span><span>WiFi</span><span>⬛</span></span></div>`;
+}
+
+function bnav(active) {
+  const items = [
+    {id:'home', label:'Home', svg:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`},
+    {id:'policy', label:'Policy', svg:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`},
+    {id:'profile', label:'You', svg:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`},
+  ];
+  return `<div class="bnav">${items.map(i=>`
+    <div class="ni${i.id===active?' on':''}" onclick="tabTo('${i.id}')">
+      <div class="ni-icon" style="color:${i.id===active?'var(--green)':'var(--t3)'}">${i.svg}</div>
+      <div class="ni-lbl">${i.label}</div>
+    </div>`).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════════════
+const SCREENS = {
+
+// ── SPLASH ────────────────────────────────────────────────
+splash() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='background:linear-gradient(160deg,#080808 0%,#0d1208 50%,#080808 100%);display:flex;flex-direction:column;align-items:center;justify-content:center';
+  el.innerHTML=`
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+      <div class="glow-green" style="top:-50px;left:-80px;opacity:.7"></div>
+      <div class="glow-green" style="bottom:100px;right:-60px;opacity:.4;width:200px;height:200px"></div>
+    </div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px">
+      <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;animation:glowPulse 2s ease-in-out infinite">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" fill="rgba(0,230,118,.3)" stroke="var(--green)" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="display fu1" style="font-size:56px;color:var(--t1);letter-spacing:-.02em;line-height:1">Clad</div>
+      <div class="fu2" style="font-size:13px;color:var(--t3);letter-spacing:.2em;text-transform:uppercase;font-weight:600">Always Covered</div>
+      <div class="fu3" style="width:48px;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent);border-radius:2px;margin-top:8px"></div>
+      <div class="fu4" style="font-size:12px;color:var(--t3);margin-top:4px">ML-powered gig worker insurance</div>
+    </div>`;
+  setTimeout(()=>go('ob1'), 2600);
+  return el;
+},
+
+// ── ONBOARD 1 — Name + Phone ──────────────────────────────
+ob1() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  el.innerHTML=`
+    <div class="err-toast" id="ob1err"></div>
+    ${sbar()}
+    <div class="steps"><div class="sdot on"></div><div class="sdot"></div><div class="sdot"></div><div class="sdot"></div></div>
+    <div style="flex:1;padding:16px 24px 0;overflow:auto">
+      <div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 1 of 4</div>
+      <div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Let's get<br/>you covered.</div>
+      <div class="fu3" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:32px">2 minutes. Protects you<br/>from this Monday.</div>
+      <div class="fu4" style="display:flex;flex-direction:column;gap:16px">
+        <div><label class="lbl">Your name</label><input class="inp" id="i_name" placeholder="Ravi Kumar" value="${S.name}" autocomplete="off"></div>
+        <div><label class="lbl">Mobile number</label><input class="inp" id="i_phone" placeholder="+91 98765 43210" value="${S.phone}" type="tel"></div>
+      </div>
+    </div>
+    <div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-white fu5" id="ob1btn" onclick="ob1Next()">Continue →</button>
+      <div class="fu6" style="text-align:center;font-size:12px;color:var(--t3);padding:4px">🔒 Your data is encrypted and never shared</div>
+    </div>`;
+  return el;
+},
+
+// ── ONBOARD 2 — PAN / OTP ─────────────────────────────────
+ob2() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  el.innerHTML=`
+    ${sbar()}
+    <div class="steps"><div class="sdot on"></div><div class="sdot on"></div><div class="sdot"></div><div class="sdot"></div></div>
+    <div style="flex:1;padding:16px 24px 0;overflow:auto">
+      <div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 2 of 4</div>
+      <div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Verify your<br/>identity.</div>
+      <div class="fu3" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:28px">PAN verification keeps the pool honest — protecting every worker.</div>
+      <div class="fu4" style="display:flex;flex-direction:column;gap:16px">
+        <div><label class="lbl">PAN number</label><input class="inp" id="i_pan" placeholder="ABCDE1234F" style="text-transform:uppercase;letter-spacing:.08em" value="${S.pan}"></div>
+        <div>
+          <label class="lbl">OTP verification</label>
+          <div style="display:flex;gap:10px">
+            <input class="inp" id="i_otp" placeholder="6-digit OTP" type="number" style="flex:1">
+            <button id="otpbtn" onclick="sendOtp()" style="padding:0 18px;background:var(--gd);border:1px solid var(--gb);border-radius:13px;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--green);cursor:pointer;white-space:nowrap;transition:all .2s">Send</button>
+          </div>
+        </div>
+        <div class="fu5 glass" style="padding:14px 16px;border-color:rgba(68,138,255,0.2) !important">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:8px;background:var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">💡</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.6"><strong style="color:var(--blue)">Why PAN?</strong> Unlike Aadhaar, PAN has a real tax filing history. A fraud ring can't batch-create 500 PANs. Door closed before fraud begins.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-white fu5" onclick="ob2Next()">Verify & Continue →</button>
+      <button class="btn btn-ghost fu6" onclick="go('ob1')">← Back</button>
+    </div>`;
+  return el;
+},
+
+// ── ONBOARD 3 — Zone ─────────────────────────────────────
+ob3() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  const zones = Object.keys(ZONE_PINCODES);
+  el.innerHTML=`
+    ${sbar()}
+    <div class="steps"><div class="sdot on"></div><div class="sdot on"></div><div class="sdot on"></div><div class="sdot"></div></div>
+    <div style="flex:1;padding:16px 24px 0;overflow:auto">
+      <div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 3 of 4</div>
+      <div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Your delivery<br/>zone.</div>
+      <div class="fu3" style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:24px">We monitor within <span style="color:var(--green);font-weight:700">3km of your zone</span> — real IMD rain + AQI data.</div>
+      <div class="fu4">
+        <label class="lbl">Platform</label>
+        <select class="inp" id="i_platform" style="margin-bottom:16px">
+          <option>Zepto</option><option>Blinkit</option><option>Instamart</option><option>Dunzo</option>
+        </select>
+      </div>
+      <div class="fu5">
+        <label class="lbl">Select your area</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="zonegrid">
+          ${zones.map((z,i)=>`<div class="zone-chip${z===S.selectedZone?' on':''}" onclick="pickZone(this,'${z}')" style="animation:fadeUp .3s ${i*.06}s both">${z}</div>`).join('')}
+        </div>
+      </div>
+      <div class="fu6 glass" style="margin-top:16px;padding:12px 16px;display:flex;align-items:center;gap:10px">
+        <div style="width:8px;height:8px;border-radius:4px;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+        <span style="font-size:13px;color:var(--t1);font-weight:600">Monitoring <span id="zone_name" style="color:var(--green)">${S.selectedZone}</span> · Pincode <span id="zone_pin">${S.pincode}</span></span>
+      </div>
+    </div>
+    <div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-white" onclick="go('ob4')">Continue →</button>
+      <button class="btn btn-ghost" onclick="go('ob2')">← Back</button>
+    </div>`;
+  return el;
+},
+
+// ── ONBOARD 4 — Pick Plan ────────────────────────────────
+ob4() {
+  const el = document.createElement('div');
+  el.className='screen';
+  const score = S.cladScore;
+  const recText = score>=80?'Pro is your best fit.':score>=60?'Plus is your best fit.':'Basic is your best fit.';
+  const plans = [
+    {key:'basic',name:'Basic',price:'29',cap:'800',speed:'24hr',label:'Starter',color:'var(--blue)',selCls:'sel-white',rec:false},
+    {key:'plus', name:'Plus', price:'49',cap:'1,500',speed:'2hr',label:'Most popular',color:'var(--green)',selCls:'sel-green',rec:true},
+    {key:'pro',  name:'Pro',  price:'79',cap:'2,500',speed:'Instant',label:'High earner',color:'var(--amber)',selCls:'sel-amber',rec:false},
+  ];
+  el.innerHTML=`
+    ${sbar()}
+    <div class="steps"><div class="sdot on"></div><div class="sdot on"></div><div class="sdot on"></div><div class="sdot on"></div></div>
+    <div style="padding:16px 24px 0;overflow:auto;padding-bottom:10px">
+      <div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Step 4 of 4</div>
+      <div class="display fu2" style="font-size:36px;color:var(--t1);line-height:1.15;margin-bottom:6px">Pick your shield.</div>
+      <div class="fu3" style="font-size:14px;color:var(--t2);margin-bottom:24px">${recText}</div>
+      <div class="fu4" style="display:flex;flex-direction:column;gap:10px" id="planlist">
+        ${plans.map((p,i)=>`
+          <div class="plan-card${i===S.selectedPlan?' '+p.selCls:''}" id="plan${i}" onclick="pickPlan(${i})" style="background:${i===S.selectedPlan?(i===1?'linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,230,118,.02))':i===2?'rgba(255,179,0,.04)':'rgba(68,138,255,.04)'):'var(--s1)'}">
+            ${p.rec?`<div style="position:absolute;top:-1px;right:20px;background:var(--green);color:#080808;font-size:10px;font-weight:800;padding:4px 10px;border-radius:0 0 8px 8px;letter-spacing:.06em">BEST FIT</div>`:''}
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:${p.color};text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">${p.label}</div>
+                <div style="font-size:20px;font-weight:900;color:var(--t1)">Clad ${p.name}</div>
+                <div style="font-size:12px;color:var(--t3);margin-top:3px">Cap ₹${p.cap}/week · ${p.speed} payout</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:2px">per week</div>
+                <div class="display" style="font-size:32px;font-weight:700;color:${p.color}">₹${p.price}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="fu5 glass" style="padding:13px 16px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--t2)">Auto-renews every Monday</span>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">Pause anytime</span>
+      </div>
+    </div>
+    <div style="padding:20px 24px 36px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-green fu6" id="activateBtn" onclick="activateCoverage()" style="font-size:17px">Activate Coverage →</button>
+      <button class="btn btn-ghost" onclick="go('ob3')">← Back</button>
+    </div>`;
+  return el;
+},
+
+// ── BUILDING — register + policy + premium ────────────────
+building() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='background:linear-gradient(160deg,#080808,#0d1208,#080808);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:32px;min-height:100%';
+  const steps = [
+    'Registering worker…',
+    'Creating policy…',
+    'Calculating ML premium…',
+    'Building CladScore…',
+    'Activating coverage…'
+  ];
+  el.innerHTML=`
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+      <div class="glow-green" style="top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;opacity:.6"></div>
+    </div>
+    <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:28px">
+      <div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.25);display:flex;align-items:center;justify-content:center;animation:glowPulse 1.5s ease-in-out infinite">
+        <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" fill="rgba(0,230,118,.2)" stroke="var(--green)" stroke-width="1.5"/></svg>
+      </div>
+      <div style="text-align:center">
+        <div class="display" style="font-size:34px;color:var(--t1);margin-bottom:6px">Setting up<br/>your shield.</div>
+        <div style="font-size:13px;color:var(--t3)" id="bstep">Connecting…</div>
+      </div>
+      <div style="width:100%">
+        <div class="pbar"><div class="pfill" id="bfill" style="width:0%;background:linear-gradient(90deg,rgba(0,230,118,.7),var(--green));box-shadow:0 0 12px rgba(0,230,118,.4)"></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%" id="buildgrid">
+        <div class="glass" style="padding:14px;border-color:rgba(0,230,118,.08) !important">
+          <div class="display" style="font-size:20px;color:var(--green);margin-bottom:2px" id="bg_score">—</div>
+          <div style="font-size:11px;color:var(--t3)">CladScore</div>
+        </div>
+        <div class="glass" style="padding:14px;border-color:rgba(0,230,118,.08) !important">
+          <div class="display" style="font-size:20px;color:var(--green);margin-bottom:2px" id="bg_grade">—</div>
+          <div style="font-size:11px;color:var(--t3)">Grade</div>
+        </div>
+        <div class="glass" style="padding:14px;border-color:rgba(0,230,118,.08) !important">
+          <div class="display" style="font-size:20px;color:var(--green);margin-bottom:2px" id="bg_premium">—</div>
+          <div style="font-size:11px;color:var(--t3)">Weekly premium</div>
+        </div>
+        <div class="glass" style="padding:14px;border-color:rgba(0,230,118,.08) !important">
+          <div class="display" style="font-size:20px;color:var(--green);margin-bottom:2px" id="bg_speed">—</div>
+          <div style="font-size:11px;color:var(--t3)">Payout speed</div>
+        </div>
+      </div>
+    </div>`;
+
+  // Execute backend calls sequentially
+  (async () => {
+    const fill = el.querySelector('#bfill');
+    const step = el.querySelector('#bstep');
+    const setFill = p => { if(fill) fill.style.width=`${p}%`; };
+    const setStep = t => { if(step) step.textContent=t; };
+
+    try {
+      setStep(steps[0]); setFill(10);
+      await doRegister(S.name, S.phone);
+      setFill(30);
+
+      setStep(steps[1]);
+      await doCreatePolicy();
+      setFill(50);
+
+      setStep(steps[2]);
+      const prem = await doGetPremium();
+      setFill(80);
+      const bg_score = el.querySelector('#bg_score');
+      const bg_grade = el.querySelector('#bg_grade');
+      const bg_premium = el.querySelector('#bg_premium');
+      const bg_speed = el.querySelector('#bg_speed');
+      if(bg_score) bg_score.textContent = `${prem.clad_score}/100`;
+      if(bg_grade) bg_grade.textContent = prem.clad_grade;
+      if(bg_premium) bg_premium.textContent = `₹${prem.predicted_premium}/wk`;
+      if(bg_speed) bg_speed.textContent = prem.payout_speed;
+      // Only set score from backend during initial setup
+      if(!S.falseClaims || S.falseClaims === 0) {
+        S.cladScore = prem.clad_score;
+        S.cladGrade = prem.clad_grade;
+      }
+
+      setStep(steps[4]); setFill(100);
+      await new Promise(r=>setTimeout(r,800));
+      go('home');
+    } catch(e) {
+      setStep(`Error: ${e.message}`);
+      console.error(e);
+      setTimeout(()=>go('home'), 2000);
+    }
+  })();
+
+  return el;
+},
+
+// ── HOME ─────────────────────────────────────────────────
+home() {
+  const el = document.createElement('div');
+  el.className='screen';
+  const score = S.cladScore;
+  const scoreEnd = scoreOff(score);
+  const td = S.triggerResult;
+  const hasTrigger = td && td.triggers_fired && td.triggers_fired.length > 0;
+  const claimAmt = S.latestClaim?.amount ? fmt(S.latestClaim.amount) : '—';
+  const weekTotal = S.claimsHistory.length>0 ? fmt(S.claimsHistory.reduce((s,c)=>s+(c.amount||0),0)) : claimAmt;
+  const intensity = td?.weather_readings?.rain_intensity ? `${td.weather_readings.rain_intensity}mm/hr` : '8.1mm/hr';
+  const duration  = td?.weather_readings?.duration ? `${td.weather_readings.duration} min` : '48 min';
+  const eventType = td?.triggers_fired?.[0]?.replace('_',' ')?.replace(/\b\w/g,l=>l.toUpperCase()) || 'Heavy rain';
+
+  const weekRows = S.claimsHistory.length>0
+    ? S.claimsHistory.slice(-3).reverse().map(c=>({
+        day: c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN',{weekday:'long'}) : '—',
+        event: `${(c.trigger||c.reason||'Weather event')} · ${S.selectedZone}`,
+        amt: fmt(c.amount), c:'var(--green)'
+      }))
+    : [{day:'No claims yet',event:'Coverage active — waiting for a trigger',amt:'—',c:'var(--t3)'}];
+
+  el.innerHTML=`
+    <div style="position:relative;overflow:hidden;padding-bottom:4px">
+      <div style="position:absolute;top:-60px;left:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.08),transparent 70%);pointer-events:none;filter:blur(30px)"></div>
+      ${sbar()}
+      <div style="padding:4px 24px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:2px">Hey there,</div>
+            <div style="font-size:28px;font-weight:900;color:var(--t1);letter-spacing:-.02em">${S.name||'User'} 👋</div>
+          </div>
+          <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--green)">${initials(S.name)}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERT CARD -->
+    <div style="padding:0 16px;margin-bottom:14px">
+      <div class="fu1 ${hasTrigger?'alert-pulse':''}" onclick="${hasTrigger?'go(\'alert\')':'runTriggersNow()'}" style="background:${hasTrigger?'linear-gradient(135deg,rgba(255,179,0,.12),rgba(255,179,0,.06))':'linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,230,118,.03))'};border:1px solid ${hasTrigger?'rgba(255,179,0,.3)':'rgba(0,230,118,.15)'};border-radius:24px;padding:20px;cursor:pointer;position:relative;overflow:hidden" id="alertcard">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div style="width:8px;height:8px;border-radius:4px;background:${hasTrigger?'var(--amber)':'var(--green)'};animation:glowPulse 1s ease-in-out infinite"></div>
+              <span style="font-size:10px;font-weight:800;color:${hasTrigger?'var(--amber)':'var(--green)'};letter-spacing:.14em;text-transform:uppercase">${hasTrigger?'Live alert':'Check triggers'}</span>
+            </div>
+            <div style="font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.01em;line-height:1.2">${hasTrigger?eventType:'Tap to scan'}<br/>${hasTrigger?'in your zone':'your zone now'}</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:4px">${hasTrigger?`${S.selectedZone} · ${intensity} · ${duration}`:`${S.selectedZone} · 5 triggers monitored`}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--t3);margin-bottom:2px">${hasTrigger?'payout ready':'est. payout'}</div>
+            <div class="display" style="font-size:38px;color:${hasTrigger?'var(--green)':'var(--t3)'};line-height:1" id="alertamt">${claimAmt}</div>
+          </div>
+        </div>
+        <div style="background:${hasTrigger?'rgba(255,179,0,.12)':'rgba(0,230,118,.08)'};border:1px solid ${hasTrigger?'rgba(255,179,0,.2)':'rgba(0,230,118,.15)'};border-radius:12px;padding:11px 16px;display:flex;justify-content:center;align-items:center;gap:8px" id="alertbtnrow">
+          <span style="font-size:14px;font-weight:800;color:${hasTrigger?'var(--amber)':'var(--green)'}">${hasTrigger?'Claim now →':'Scan now →'}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCORE + PLAN -->
+    <div style="padding:0 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fu2 glass" style="padding:16px">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">CladScore</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="52" height="52" viewBox="0 0 100 100" style="flex-shrink:0">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10" stroke-linecap="round"
+              class="ring-progress" style="--end:${scoreEnd};filter:drop-shadow(0 0 6px var(--green))"/>
+            <text x="50" y="55" text-anchor="middle" font-size="26" font-weight="900" fill="var(--t1)" font-family="Instrument Serif">${score}</text>
+          </svg>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--green)">${scoreLbl(score)}</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5">Grade ${S.cladGrade}<br/>ML computed</div>
+          </div>
+        </div>
+      </div>
+      <div class="fu3 glass" style="padding:16px;background:linear-gradient(135deg,rgba(0,230,118,.06),transparent)!important;border-color:rgba(0,230,118,.12)!important">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Active Plan</div>
+        <div style="font-size:18px;font-weight:900;color:var(--t1);margin-bottom:4px">${planLabel(S.plan)}</div>
+        <div class="tag tag-green" style="margin-bottom:8px;font-size:10px">● Active</div>
+        <div style="font-size:12px;color:var(--t2)">Cap <strong style="color:var(--green)">${planCap(S.plan)}</strong>/wk</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">${planSpeed(S.plan)} auto-payout</div>
+      </div>
+    </div>
+
+    <!-- ML PREMIUM CARD (live from backend) -->
+    ${S.premiumData ? `
+    <div style="padding:0 16px;margin-bottom:14px">
+      <div class="fu4 glass" style="padding:18px;border-color:rgba(0,230,118,.1)!important">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:var(--t1)">ML Premium Breakdown</div>
+          <div class="tag tag-green" style="font-size:10px">${S.premiumData.ml_used?'LightGBM':'Actuarial'}</div>
+        </div>
+        ${(S.premiumData.breakdown||[]).slice(0,4).map((b,i,a)=>`
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:${i<Math.min(a.length,4)-1?'1px solid var(--b1)':'none'}">
+            <span style="color:var(--t2)">${b.factor}</span>
+            <span style="color:${b.direction==='discount'?'var(--green)':b.direction==='base'?'var(--t1)':'var(--red)'};font-weight:700">${b.direction==='discount'?'-':b.direction==='base'?'':'+'} ₹${Math.abs(b.amount)}</span>
+          </div>`).join('')}
+        <div style="margin-top:12px;background:var(--gd);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;font-weight:700;color:var(--green)">Your weekly premium</span>
+          <span class="display" style="font-size:22px;color:var(--green)">₹${S.premiumData.predicted_premium}</span>
+        </div>
+      </div>
+    </div>` : ''}
+
+    <!-- WEEK SUMMARY -->
+    <div style="padding:0 16px;margin-bottom:14px">
+      <div class="fu5 glass" style="padding:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:var(--t1)">This Week</div>
+          <div class="tag tag-dim" style="font-size:11px">${new Date().toLocaleDateString('en-IN',{month:'short',day:'numeric'})}</div>
+        </div>
+        ${weekRows.map((r,i)=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:${i<weekRows.length-1?'1px solid var(--b1)':'none'}">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:8px;height:8px;border-radius:4px;background:${r.c}"></div>
+              <div><div style="font-size:13px;font-weight:700;color:var(--t1)">${r.day}</div><div style="font-size:11px;color:var(--t3)">${r.event}</div></div>
+            </div>
+            <div class="display" style="font-size:17px;color:${r.c}">${r.amt}</div>
+          </div>`).join('')}
+        <div style="margin-top:12px;background:var(--gd);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:var(--green)">Total claimed this week</span>
+          <span class="display" style="font-size:20px;color:var(--green)">${weekTotal}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div style="padding:0 16px;margin-bottom:12px">
+      <div class="fu6" style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Quick Actions</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div onclick="tabTo('policy')" class="glass" style="padding:16px;cursor:pointer;transition:transform .2s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'">
+          <div style="font-size:24px;margin-bottom:6px">🛡️</div>
+          <div style="font-size:13px;font-weight:800;color:var(--t1)">View Policy</div>
+          <div style="font-size:11px;color:var(--t3)">${planLabel(S.plan)}</div>
+        </div>
+        <div onclick="go('manualclaim')" class="glass" style="padding:16px;cursor:pointer;transition:transform .2s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'">
+          <div style="font-size:24px;margin-bottom:6px">⚡</div>
+          <div style="font-size:13px;font-weight:800;color:var(--t1)">File Claim</div>
+          <div style="font-size:11px;color:var(--t3)">Zero-touch</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    ${bnav('home')}`;
+
+  // Load claims in background
+  loadClaims().then(()=>{ /* data loaded */ });
+  return el;
+},
+
+// ── ALERT — live trigger screen ───────────────────────────
+alert() {
+  const el = document.createElement('div');
+  el.className='screen';
+  const td = S.triggerResult;
+  const weather = td?.weather_readings || {};
+  const firedTriggers = td?.triggers_fired || [];
+  const claim = S.latestClaim;
+  const claimAmt = claim?.amount ? Math.round(claim.amount) : Math.round(S.avgDailyEarning * planRate(S.plan));
+  const intensity = weather.rain_intensity ? `${weather.rain_intensity} mm/hr` : '8.1 mm/hr';
+  const duration  = weather.duration ? `${weather.duration} min` : '48 min';
+  const aqi       = weather.aqi || 97;
+  const wind      = weather.wind_speed || 22;
+  const triggerTime = td?.checked_at ? new Date(td.checked_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : now();
+  const drops = Array.from({length:22},()=>({l:Math.random()*100,d:Math.random()*.9,h:7+Math.random()*12,dur:.55+Math.random()*.35}));
+
+  // Build trigger checklist
+  const checks = [
+    {label:`Rainfall > 7.5mm/hr (${weather.rain_intensity||'8.1'}mm)`, pass: (weather.rain_intensity||8.1)>7.5},
+    {label:`Duration > 45min (${weather.duration||'48'}min)`,          pass: (weather.duration||48)>45},
+    {label:`Zone: ${S.selectedZone} · Pincode ${S.pincode}`,           pass: true},
+    {label:`AQI: ${aqi} · Wind: ${wind}km/h`,                          pass: true},
+    {label:'Fraud engine: 15/15 signals clean',                         pass: true},
+  ];
+
+  el.innerHTML=`
+    <div style="background:linear-gradient(180deg,#061428 0%,#080808 100%);padding-bottom:28px;position:relative;overflow:hidden;min-height:260px">
+      ${sbar()}
+      <div style="position:absolute;inset:0;pointer-events:none">
+        ${drops.map(d=>`<div style="position:absolute;left:${d.l}%;top:0;width:1.5px;height:${d.h}px;border-radius:1px;background:rgba(100,168,255,.55);opacity:0;animation:rain ${d.dur}s linear ${d.d}s infinite"></div>`).join('')}
+        <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,#080808)"></div>
+      </div>
+      <div style="padding:6px 24px 0;position:relative;z-index:2">
+        <div class="tag fu1" style="background:rgba(255,100,50,.15);color:#FF8060;border:1px solid rgba(255,100,50,.25);margin-bottom:14px">● ${firedTriggers.length} trigger${firedTriggers.length!==1?'s':''} fired</div>
+        <div class="display fu2" style="font-size:38px;color:var(--t1);line-height:1.15;margin-bottom:8px">Disruption<br/>detected.</div>
+        <div class="fu3" style="display:flex;align-items:center;gap:8px">
+          <div style="width:7px;height:7px;border-radius:4px;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+          <span style="font-size:13px;color:var(--t2)">${S.selectedZone} · Pincode ${S.pincode}</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:16px 16px;display:flex;flex-direction:column;gap:12px">
+      <!-- 5 TRIGGERS STATUS -->
+      <div class="fu1 glass" style="padding:18px">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">5 Automated Triggers</div>
+        ${(td?.triggers_checked||[]).map((t,i)=>`
+          <div class="check-item" style="animation:slideInRow .3s ${i*.08}s both">
+            <div style="width:22px;height:22px;border-radius:7px;background:${t.fired?'var(--green)':'var(--s3)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:${t.fired?'0 0 10px rgba(0,230,118,.3)':'none'}">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                ${t.fired?'<path class="check-path" d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M18 6L6 18M6 6l12 12" stroke="rgba(242,239,232,.3)" stroke-width="2" stroke-linecap="round"/>'}
+              </svg>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:700;color:${t.fired?'var(--t1)':'var(--t3)'}">${t.trigger.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:1px">${t.condition}</div>
+            </div>
+            <div class="tag ${t.fired?'tag-green':'tag-dim'}" style="font-size:9px;padding:3px 8px">${t.fired?'FIRED':'—'}</div>
+          </div>`).join('')||checks.map((c,i)=>`
+          <div class="check-item" style="animation:slideInRow .3s ${i*.08}s both">
+            <div style="width:22px;height:22px;border-radius:7px;background:${c.pass?'var(--green)':'var(--s3)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:${c.pass?'0 0 10px rgba(0,230,118,.3)':'none'}">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path class="check-path" d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span style="font-size:13px;color:var(--t1);font-weight:500">${c.label}</span>
+          </div>`).join('')}
+      </div>
+
+      <!-- LIVE READINGS -->
+      <div class="fu2 glass" style="padding:18px">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Live Weather Readings</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          ${[[intensity,'Rain intensity','green'],[duration,'Ongoing duration','green'],[`AQI ${aqi}`,'Air quality','neutral'],[`${wind}km/h`,'Wind speed','neutral']].map(([v,l,t])=>`
+            <div style="background:${t==='green'?'rgba(0,230,118,.08)':'var(--s2)'};border-radius:14px;padding:14px;border:1px solid ${t==='green'?'rgba(0,230,118,.15)':'var(--b1)'}">
+              <div class="display" style="font-size:20px;color:${t==='green'?'var(--green)':'var(--t1)'}">${v}</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:3px">${l}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- PAYOUT CALC -->
+      <div class="fu3" style="background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,230,118,.03));border:1px solid rgba(0,230,118,.15);border-radius:24px;padding:20px">
+        <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Your Payout Calculation</div>
+        ${[[`Today's Earning DNA`,fmt(S.avgDailyEarning)],[`${planLabel(S.plan)} rate`,`× ${Math.round(planRate(S.plan)*100)}%`]].map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);padding:4px 0">
+            <span>${k}</span><span style="color:var(--t1);font-weight:700">${v}</span>
+          </div>`).join('')}
+        <div style="height:1px;background:rgba(0,230,118,.15);margin:12px 0"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:15px;font-weight:700;color:var(--t1)">You receive</span>
+          <div class="display" style="font-size:44px;color:var(--green);line-height:1;filter:drop-shadow(0 0 20px rgba(0,230,118,.4))">${fmt(claimAmt)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 16px 36px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-green fu4" onclick="go('claiming')" style="font-size:17px">Claim ${fmt(claimAmt)} Now →</button>
+      <button class="btn btn-ghost fu5" onclick="go('home')">Back to home</button>
+    </div>`;
+  return el;
+},
+
+// ── CLAIMING — processing animation ──────────────────────
+claiming() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='background:linear-gradient(160deg,#080808,#061410,#080808);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:32px;gap:28px';
+  const steps = [
+    'Validating trigger data…',
+    'Running 15 fraud signals…',
+    `Zone consensus: ${S.selectedZone}…`,
+    'Initiating UPI transfer…'
+  ];
+  el.innerHTML=`
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.1),transparent 70%);filter:blur(40px)"></div>
+    </div>
+    <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:24px">
+      <div style="width:72px;height:72px;border-radius:22px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;animation:glowPulse 1.2s ease-in-out infinite">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="text-align:center">
+        <div class="display" style="font-size:30px;color:var(--t1);margin-bottom:6px">Processing<br/>your claim</div>
+        <div style="font-size:13px;color:var(--t3)">Zero-touch · Fraud-free in under 3 seconds</div>
+      </div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:8px" id="csteps">
+        ${steps.map((s,i)=>`
+          <div id="cs${i}" style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:12px;background:${i===0?'rgba(0,230,118,.06)':'transparent'};border:1px solid ${i===0?'rgba(0,230,118,.12)':'transparent'};opacity:${i===0?1:.3};transition:all .4s ease">
+            <div id="ci${i}" style="width:22px;height:22px;border-radius:7px;background:${i===0?'rgba(0,230,118,.15)':'var(--s2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              ${i===0?`<div style="width:7px;height:7px;border-radius:4px;background:var(--green);animation:glowPulse .8s ease-in-out infinite"></div>`:''}
+            </div>
+            <span style="font-size:13px;color:var(--t1);font-weight:500">${s}</span>
+          </div>`).join('')}
+      </div>
+      <div style="width:100%"><div class="pbar" style="height:4px"><div class="pfill" id="cpfill" style="width:0%;background:linear-gradient(90deg,rgba(0,230,118,.6),var(--green));box-shadow:0 0 10px rgba(0,230,118,.4)"></div></div></div>
+    </div>`;
+
+  let step = 0;
+  const iv = setInterval(()=>{
+    const ci=el.querySelector(`#ci${step}`), cs=el.querySelector(`#cs${step}`);
+    if(ci){ci.innerHTML=`<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/></svg>`;ci.style.background='var(--green)';}
+    if(cs){cs.style.background='rgba(0,230,118,.04)';cs.style.borderColor='rgba(0,230,118,.1)';}
+    step++;
+    const fill=el.querySelector('#cpfill');
+    if(fill) fill.style.width=`${(step/steps.length)*100}%`;
+    if(step<steps.length){
+      const ns=el.querySelector(`#cs${step}`),ni=el.querySelector(`#ci${step}`);
+      if(ns){ns.style.opacity='1';ns.style.background='rgba(0,230,118,.06)';ns.style.borderColor='rgba(0,230,118,.12)';}
+      if(ni){ni.innerHTML=`<div style="width:7px;height:7px;border-radius:4px;background:var(--green);animation:glowPulse .8s ease-in-out infinite"></div>`;ni.style.background='rgba(0,230,118,.15)';}
+    }
+    if(step>=steps.length){ clearInterval(iv); setTimeout(()=>go('payout'),500); }
+  }, 800);
+  return el;
+},
+
+// ── PAYOUT — success screen ───────────────────────────────
+payout() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='background:linear-gradient(160deg,#060f08,#080808 60%);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:32px;gap:20px';
+  const claim = S.latestClaim;
+  const amt = claim?.amount ? fmt(claim.amount) : fmt(S.avgDailyEarning * planRate(S.plan));
+  const ref = claim?.id ? `GS-${String(claim.id).padStart(4,'0')}` : `GS-${Date.now().toString().slice(-4)}`;
+  const trigger = (claim?.trigger||claim?.reason||'Weather event').replace(/_/g,' ');
+  const speed = claim?.payout_speed || planSpeed(S.plan);
+  const policyStatus = S.policy?.status || 'active';
+
+  el.innerHTML=`
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+      <div style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.15),transparent 70%);filter:blur(40px);animation:glowPulse 3s ease-in-out infinite"></div>
+    </div>
+    <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:20px">
+      <div style="width:84px;height:84px;border-radius:26px;background:var(--green);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(0,230,118,.5),0 0 120px rgba(0,230,118,.2);animation:scaleSpring .5s cubic-bezier(.34,1.56,.64,1) forwards">
+        <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path class="check-path" d="M5 12l5 5L20 7" stroke="#080808" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="text-align:center;animation:countUp .5s cubic-bezier(.34,1.56,.64,1) .2s both">
+        <div style="font-size:12px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px">Payout sent</div>
+        <div class="display" style="font-size:72px;color:var(--green);line-height:1;filter:drop-shadow(0 0 30px rgba(0,230,118,.5))">${amt}</div>
+        <div style="font-size:14px;color:var(--t3);margin-top:6px">Credited · ${speed}</div>
+      </div>
+      <div class="glass" style="width:100%;padding:18px;animation:fadeUp .4s .4s cubic-bezier(.16,1,.3,1) both">
+        ${[['Reference',ref],['Trigger',trigger],['Plan',planLabel(S.plan)],['CladScore',`${S.cladScore} · ${S.cladGrade}`],['Policy',policyStatus],['Status','✓ Credited']].map(([k,v],i,a)=>`
+          <div style="display:flex;justify-content:space-between;padding:9px 0;${i<a.length-1?'border-bottom:1px solid var(--b1)':''}">
+            <span style="font-size:12px;color:var(--t3)">${k}</span>
+            <span style="font-size:12px;color:var(--t1);font-weight:700">${v}</span>
+          </div>`).join('')}
+      </div>
+      <div style="width:100%;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.12);border-radius:14px;padding:13px 16px;animation:fadeUp .4s .5s cubic-bezier(.16,1,.3,1) both">
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">
+          Zone <span style="color:var(--green);font-weight:700">${S.selectedZone}</span> consensus verified. LightGBM model used.
+          ${S.payoutPenaltyNote
+            ? `<br><span style="color:var(--amber);font-weight:700">⚠ ${S.payoutPenaltyNote}</span>`
+            : ' No fraud flags. Claim auto-approved.'}
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="go('home')" style="width:100%;animation:fadeUp .4s .6s cubic-bezier(.16,1,.3,1) both">Back to Home</button>
+    </div>`;
+
+  loadClaims();
+  return el;
+},
+
+// ── MANUAL CLAIM ─────────────────────────────────────────
+manualclaim() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='display:flex;flex-direction:column;min-height:100%';
+  const estAmt = Math.round(S.avgDailyEarning * planRate(S.plan));
+  el.innerHTML=`
+    <div class="err-toast" id="mce"></div>
+    ${sbar()}
+    <div style="padding:4px 24px 0;margin-bottom:20px">
+      <div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Zero-touch claim</div>
+      <div class="display fu2" style="font-size:32px;color:var(--t1);line-height:1.15;margin-bottom:6px">File a<br/>manual claim.</div>
+      <div class="fu3" style="font-size:14px;color:var(--t2)">Auto-approved in seconds for CladScore ≥ 75.</div>
+    </div>
+    <div style="padding:0 24px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px">
+      <div class="fu4 glass" style="padding:16px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:11px;color:var(--t3)">Your CladScore</div>
+          <div style="font-size:20px;font-weight:900;color:var(--green)">${S.cladScore} · ${S.cladGrade}</div>
+        </div>
+        <div class="tag ${S.cladScore>=75?'tag-green':'tag-amber'}">${S.cladScore>=75?'✓ Auto-approve':'6hr hold'}</div>
+      </div>
+      <div class="fu5">
+        <label class="lbl">Claim amount (₹)</label>
+        <input class="inp" id="claim_amt" type="number" placeholder="${estAmt}" value="${estAmt}">
+        <div style="font-size:11px;color:var(--t3);margin-top:6px">Suggested: ₹${estAmt} (${Math.round(planRate(S.plan)*100)}% of daily earning)</div>
+      </div>
+      <div class="fu6">
+        <label class="lbl">Reason for claim</label>
+        <select class="inp" id="claim_reason">
+          <option value="Road blocked due to waterlogging">Road blocked due to waterlogging</option>
+          <option value="Heavy rain — unable to deliver">Heavy rain — unable to deliver</option>
+          <option value="Hazardous AQI — outdoor work restricted">Hazardous AQI — outdoor work restricted</option>
+          <option value="App outage — no orders received">App outage — no orders received</option>
+          <option value="Strike/curfew — movement restricted">Strike/curfew — movement restricted</option>
+          <option value="Cyclonic wind — delivery halted">Cyclonic wind — delivery halted</option>
+        </select>
+      </div>
+      <div class="glass" style="padding:14px 16px;border-color:rgba(0,230,118,.1)!important">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7">
+          <span style="color:var(--green);font-weight:700">How it works:</span> We verify a live trigger (rain, AQI, etc.) in your zone before approving.
+          ${S.triggerResult?.triggers_fired?.length > 0
+            ? `<br><span style="color:var(--green)">✓ Active trigger: <strong>${S.triggerResult.triggers_fired[0].replace(/_/g,' ')}</strong></span>`
+            : `<br><span style="color:var(--amber)">⚠ No active trigger found yet — we'll check on submit.</span>`
+          }
+        </div>
+      </div>
+    </div>
+    <div style="padding:24px 24px 36px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-green" id="claimsubmit" onclick="submitManualClaim()">Submit Claim →</button>
+      <button class="btn btn-ghost" onclick="go('home')">Cancel</button>
+    </div>`;
+  return el;
+},
+
+// ── POLICY ───────────────────────────────────────────────
+policy() {
+  const el = document.createElement('div');
+  el.className='screen';
+  const pm = S.premiumData;
+  const trigs = [
+    ['🌧️','Heavy Rain','> 7.5mm/hr · 45+ min',`${Math.round(planRate(S.plan)*100)}%`,'green'],
+    ['🌡️','AQI Spike','AQI > 200 · Hazardous','30%','blue'],
+    ['🌊','Waterlogging','Zone score > 0.65','50%','amber'],
+    ['🌪️','Cyclone/Wind','Wind > 60 km/h','50%','red'],
+    ['🚧','Strike/Curfew','Civil alert active','60%','red'],
+  ];
+  el.innerHTML=`
+    <div style="position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.06),transparent 70%);filter:blur(20px);pointer-events:none"></div>
+      ${sbar()}
+      <div style="padding:4px 24px 20px">
+        <div class="fu1" style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Protection details</div>
+        <div style="font-size:28px;font-weight:900;color:var(--t1);letter-spacing:-.02em">My Shield</div>
+      </div>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px">
+      <!-- ACTIVE PLAN -->
+      <div class="fu1" style="background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(0,230,118,.03));border:1px solid rgba(0,230,118,.15);border-radius:24px;padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Active Plan</div>
+            <div style="font-size:26px;font-weight:900;color:var(--t1)">${planLabel(S.plan)}</div>
+          </div>
+          <div class="tag tag-green">● Live</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          ${[[planCap(S.plan),'Weekly cap'],[planSpeed(S.plan),'Payout speed'],[planCost(S.plan),'Weekly cost']].map(([v,l])=>`
+            <div style="background:rgba(0,230,118,.08);border-radius:12px;padding:11px;text-align:center;border:1px solid rgba(0,230,118,.1)">
+              <div class="display" style="font-size:18px;color:var(--green)">${v}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:2px">${l}</div>
+            </div>`).join('')}
+        </div>
+        ${S.policy?`<div style="margin-top:12px;font-size:11px;color:var(--t3)">Policy ID: #${S.policy.id||'—'} · Created ${S.policy.created_at?new Date(S.policy.created_at).toLocaleDateString('en-IN'):'today'}</div>`:''}
+      </div>
+
+      <!-- ML PREMIUM -->
+      ${pm?`
+      <div class="fu2 glass" style="padding:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;color:var(--t1)">ML Premium Engine</div>
+          <div class="tag ${pm.ml_used?'tag-green':'tag-amber'}">${pm.ml_used?'LightGBM':'Actuarial'}</div>
+        </div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px">Model: ${pm.model_version||'LightGBM-v1'} · Confidence: ${pm.confidence||'High'}</div>
+        ${(pm.breakdown||[]).map((b,i,a)=>`
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:${i<a.length-1?'1px solid var(--b1)':'none'}">
+            <span style="color:var(--t2)">${b.factor}</span>
+            <span style="color:${b.direction==='discount'?'var(--green)':b.direction==='base'?'var(--t1)':'var(--red)'};font-weight:700">${b.direction==='discount'?'− ':'+ '}₹${Math.abs(b.amount)}</span>
+          </div>`).join('')}
+        <div style="margin-top:12px;background:var(--gd);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between">
+          <span style="font-size:13px;font-weight:700;color:var(--green)">Your weekly premium</span>
+          <span class="display" style="font-size:22px;color:var(--green)">₹${pm.predicted_premium}</span>
+        </div>
+      </div>`:''}
+
+      <!-- CLADSCORE DETAIL -->
+      ${pm?`
+      <div class="fu3 glass" style="padding:18px">
+        <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:14px">CladScore Breakdown</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          ${[['Score',`${S.cladScore}/100`],['Grade',S.cladGrade],['Payout Speed',pm.payout_speed||planSpeed(S.plan)],['Zone Risk',pm.zone?.flood_frequency?`${Math.round(pm.zone.flood_frequency*100)}% flood`:'—']].map(([k,v])=>`
+            <div class="mpill">
+              <div style="font-size:15px;font-weight:800;color:var(--green)">${v}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:2px">${k}</div>
+            </div>`).join('')}
+        </div>
+      </div>`:''}
+
+      <!-- 5 TRIGGERS -->
+      <div class="fu4 glass" style="padding:18px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">5 Automated Triggers</div>
+        ${trigs.map(([ic,name,thresh,rate,c],i,a)=>`
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 0;${i<a.length-1?'border-bottom:1px solid var(--b1)':''}">
+            <div style="width:38px;height:38px;border-radius:11px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">${ic}</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--t1)">${name}</div><div style="font-size:11px;color:var(--t3)">${thresh}</div></div>
+            <div class="tag tag-green" style="font-size:11px">${rate}</div>
+          </div>`).join('')}
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+        <button class="btn btn-green" onclick="go('manualclaim')">⚡ File Manual Claim</button>
+        <button class="btn btn-ghost" onclick="runTriggersNow()">🔍 Scan Triggers Now</button>
+      </div>
+    </div>
+    ${bnav('policy')}`;
+  return el;
+},
+
+// ── PROFILE ──────────────────────────────────────────────
+profile() {
+  const el = document.createElement('div');
+  el.className='screen';
+  const score = S.cladScore;
+  const scoreEnd = scoreOff(score);
+  const earn = S.avgDailyEarning;
+  const history = S.claimsHistory;
+  const claimsTotal = history.length>0 ? fmt(history.reduce((s,c)=>s+(c.amount||0),0)) : '—';
+
+  const histRows = history.length>0
+    ? history.slice(-5).reverse().map(c=>[
+        c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN',{month:'short',day:'numeric'}) : '—',
+        (c.trigger||c.reason||'Weather event').replace(/_/g,' '),
+        fmt(c.amount),
+        c.status||'approved'
+      ])
+    : [['—','No claims yet','—','—']];
+
+  el.innerHTML=`
+    ${sbar()}
+    <div style="padding:4px 24px 0;margin-bottom:20px">
+      <div class="fu1" style="display:flex;align-items:center;gap:14px">
+        <div style="width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:var(--green)">${initials(S.name)}</div>
+        <div>
+          <div style="font-size:20px;font-weight:900;color:var(--t1)">${S.name||'User'}</div>
+          <div style="font-size:13px;color:var(--t3)">${S.platform||'Zepto'} · ${S.selectedZone}</div>
+        </div>
+      </div>
+
+      <!-- WORKER STATS (from backend) -->
+      ${S.worker?`
+      <div class="fu2" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px">
+        ${[['₹'+Math.round(S.worker.avg_daily_earning||earn),'Daily avg'],[S.worker.delivery_consistency?Math.round(S.worker.delivery_consistency*100)+'%':'88%','Consistency'],[S.worker.claim_free_weeks||'8','Claim-free wks']].map(([v,l])=>`
+          <div class="mpill">
+            <div style="font-size:16px;font-weight:800;color:var(--green)">${v}</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:2px">${l}</div>
+          </div>`).join('')}
+      </div>`:''}
+
+      <!-- CLADSCORE RING -->
+      <div class="fu3 glass" style="margin-top:16px;padding:16px;display:flex;align-items:center;gap:16px">
+        <svg width="60" height="60" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10" stroke-linecap="round"
+            class="ring-progress" style="--end:${scoreEnd};filter:drop-shadow(0 0 4px var(--green))"/>
+          <text x="50" y="55" text-anchor="middle" font-size="28" font-weight="900" fill="var(--t1)" font-family="Instrument Serif">${score}</text>
+        </svg>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:2px">CladScore · ${scoreLbl(score)}</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:8px">Grade ${S.cladGrade} · ${planLabel(S.plan)}</div>
+          <div class="pbar"><div class="pfill" style="width:${score}%;background:var(--green);box-shadow:0 0 8px rgba(0,230,118,.3)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px">
+      <!-- EARNING DNA -->
+      <div class="fu4 glass" style="padding:18px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Earning DNA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          ${[[fmt(Math.round(earn*.88)),'Weekday avg'],[fmt(Math.round(earn*1.25)),'Weekend avg'],['7–9 PM','Peak hours'],['Sunday','Best day']].map(([v,l])=>`
+            <div class="mpill">
+              <div class="display" style="font-size:18px;color:var(--t1)">${v}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:3px">${l}</div>
+            </div>`).join('')}
+        </div>
+        <div style="background:var(--gd);border:1px solid var(--gb);border-radius:11px;padding:11px 13px">
+          <div style="font-size:12px;color:var(--green);line-height:1.5">Payouts based on <strong>your</strong> earnings — not a flat average. LightGBM-computed.</div>
+        </div>
+      </div>
+
+      <!-- CLAIM HISTORY -->
+      <div class="fu5 glass" style="padding:18px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Claim History</div>
+        ${histRows.map(([d,e,a,st],i,arr)=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;${i<arr.length-1?'border-bottom:1px solid var(--b1)':''}">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:8px;height:8px;border-radius:4px;background:${a==='—'?'var(--t3)':'var(--green)'}"></div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--t1)">${e}</div>
+                <div style="font-size:11px;color:var(--t3)">${d}</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="display" style="font-size:17px;color:${a==='—'?'var(--t3)':'var(--green)'}">${a}</div>
+              ${st!=='—'?`<div style="font-size:9px;color:${st==='approved'?'var(--green)':'var(--amber)'};font-weight:700">${st.toUpperCase()}</div>`:''}
+            </div>
+          </div>`).join('')}
+        <div style="margin-top:12px;background:var(--gd);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:var(--green)">Total claimed</span>
+          <span class="display" style="font-size:22px;color:var(--green)">${claimsTotal}</span>
+        </div>
+      </div>
+
+      <!-- BACKEND STATUS -->
+      <div class="fu6 glass" style="padding:16px" id="healthcard">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Backend Status</div>
+        <div id="healthinner" style="font-size:13px;color:var(--t3)">Checking…</div>
+      </div>
+      <div style="height:16px"></div>
+    </div>
+    ${bnav('profile')}`;
+
+  // Load claims and health
+  loadClaims().then(()=>{});
+  apiGet('/health').then(h=>{
+    const hi = el.querySelector('#healthinner');
+    if(hi) hi.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${[['API','✓ Online'],['Workers',h.workers],['Policies',h.policies],['Claims',h.claims]].map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">
+            <span style="color:var(--t3)">${k}</span>
+            <span style="color:var(--green);font-weight:700">${v}</span>
+          </div>`).join('')}
+      </div>`;
+  }).catch(()=>{
+    const hi = el.querySelector('#healthinner');
+    if(hi) hi.innerHTML=`<span style="color:var(--red)">⚠ Backend offline — start uvicorn</span>`;
+  });
+  return el;
+},
+    claimrejected() {
+  const el = document.createElement('div');
+  el.className='screen';
+  el.style.cssText='background:linear-gradient(160deg,#0f0808,#080808 60%);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:32px;gap:20px';
+
+  el.innerHTML=`
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+      <div style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(255,82,82,.1),transparent 70%);filter:blur(40px)"></div>
+    </div>
+    <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:20px">
+
+      <!-- Red X icon -->
+      <div style="width:84px;height:84px;border-radius:26px;background:var(--red);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(255,82,82,.4),0 0 120px rgba(255,82,82,.15);animation:scaleSpring .5s cubic-bezier(.34,1.56,.64,1) forwards">
+        <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="#080808" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+
+      <!-- Title -->
+      <div style="text-align:center;animation:countUp .5s cubic-bezier(.34,1.56,.64,1) .2s both">
+        <div style="font-size:12px;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px">Claim Rejected</div>
+        <div class="display" style="font-size:42px;color:var(--t1);line-height:1.1">No active<br/>trigger found.</div>
+        <div style="font-size:14px;color:var(--t3);margin-top:8px;line-height:1.6">The event you selected is not<br/>currently active in your zone.</div>
+      </div>
+
+      <!-- Score penalty card -->
+      <div style="width:100%;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.2);border-radius:20px;padding:20px;animation:fadeUp .4s .3s cubic-bezier(.16,1,.3,1) both">
+        <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">⚠ CladScore Penalty Applied</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,82,82,.15)">
+          <span style="font-size:13px;color:var(--t2)">Reason</span>
+          <span style="font-size:13px;color:var(--t1);font-weight:700">False claim attempt</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,82,82,.15)">
+          <span style="font-size:13px;color:var(--t2)">Score change</span>
+          <span style="font-size:13px;color:var(--red);font-weight:700"><span style="font-size:13px;color:var(--red);font-weight:700">− ${S.falseClaims>=3?15:S.falseClaims===2?10:8} points (attempt ${S.falseClaims})</span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+          <span style="font-size:13px;color:var(--t2)">New CladScore</span>
+          <span style="font-size:15px;color:var(--t1);font-weight:900">${S.cladScore} · ${S.cladGrade}</span>
+        </div>
+      </div>
+
+      <!-- Info box -->
+      <div style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--b1);border-radius:16px;padding:14px 16px;animation:fadeUp .4s .4s cubic-bezier(.16,1,.3,1) both">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7">
+          Claims are only approved when a real trigger — rain, AQI spike, waterlogging, cyclone, or curfew — is active in your zone.
+          <span style="color:var(--green);font-weight:700">Repeated false claims will lower your score further.</span>
+        </div>
+      </div>
+
+      <button class="btn btn-ghost" onclick="go('home')" style="width:100%;animation:fadeUp .4s .5s cubic-bezier(.16,1,.3,1) both">Back to Home</button>
+    </div>`;
+  return el;
+},
+
+};
+
+
+
+// ═══════════════════════════════════════════════════════════
+// ACTION HANDLERS
+// ═══════════════════════════════════════════════════════════
+function sendOtp() {
+  const btn = document.getElementById('otpbtn');
+  if(btn){btn.textContent='✓ Sent';btn.style.background='var(--gd)';btn.style.color='var(--green)';}
+  setTimeout(()=>{
+    const otp = document.getElementById('i_otp');
+    if(otp) otp.value = '234567'; // mock OTP fill
+  }, 500);
+}
+
+function pickZone(el, zone) {
+  document.querySelectorAll('.zone-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  S.selectedZone = zone;
+  S.pincode = ZONE_PINCODES[zone] || '560034';
+  const zn = document.getElementById('zone_name');
+  const zp = document.getElementById('zone_pin');
+  if(zn) zn.textContent = zone;
+  if(zp) zp.textContent = S.pincode;
+}
+
+function pickPlan(i) {
+  S.selectedPlan = i;
+  const selCls = ['sel-white','sel-green','sel-amber'];
+  const bgs = ['rgba(68,138,255,.04)','linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,230,118,.02))','rgba(255,179,0,.04)'];
+  [0,1,2].forEach(j=>{
+    const c = document.getElementById(`plan${j}`);
+    if(!c) return;
+    c.className = 'plan-card' + (j===i?' '+selCls[j]:'');
+    c.style.background = j===i ? bgs[j] : 'var(--s1)';
+  });
+}
+
+function ob1Next() {
+  const name = document.getElementById('i_name')?.value?.trim();
+  const phone = document.getElementById('i_phone')?.value?.trim();
+  if(!name){ showErr(currentEl,'Please enter your name'); return; }
+  S.name = name;
+  S.phone = phone;
+  go('ob2');
+}
+
+function ob2Next() {
+  const pan = document.getElementById('i_pan')?.value?.trim();
+  S.pan = pan || 'ABCDE1234F';
+  go('ob3');
+}
+
+async function activateCoverage() {
+  const btn = document.getElementById('activateBtn');
+  if(btn){ btn.disabled=true; btn.innerHTML=`<span class="spinner"></span>Activating…`; }
+  S.plan = ['basic','plus','pro'][S.selectedPlan];
+  S.platform = document.getElementById('i_platform')?.value || 'Zepto';
+  go('building');
+}
+
+async function runTriggersNow() {
+  // Show loading on alert card
+  const card = document.getElementById('alertcard');
+  if(card){ const row=document.getElementById('alertbtnrow'); if(row) row.innerHTML=`<span class="spinner spinner-w"></span><span style="font-size:14px;font-weight:800;color:var(--green)">Scanning…</span>`; }
+
+  try {
+    const data = await doRunTriggers();
+    // Reload home to show results
+    go('home');
+    // Then go to alert if triggers fired
+    if(data.triggers_fired && data.triggers_fired.length > 0) {
+      setTimeout(()=>go('alert'), 400);
+    }
+  } catch(e) {
+    console.error('Trigger error:', e);
+    // Show offline message but still navigate to alert for demo
+    S.triggerResult = {
+      triggers_fired: ['heavy_rain'],
+      triggers_checked: [
+        {trigger:'heavy_rain',condition:'rain_intensity=8.1 > 7.5 AND duration=48min > 45',fired:true},
+        {trigger:'aqi_spike',condition:'aqi=97 > 200',fired:false},
+        {trigger:'waterlogging',condition:'waterlogging_score=0.68 > 0.65',fired:true},
+        {trigger:'cyclone_wind',condition:'wind_speed=22km/h > 60',fired:false},
+        {trigger:'strike_curfew',condition:'curfew_active=false',fired:false},
+      ],
+      weather_readings:{rain_intensity:8.1,duration:48,wind_speed:22,aqi:97},
+      claims_created:[{id:1,amount:Math.round(S.avgDailyEarning*planRate(S.plan)),trigger:'heavy_rain',status:'approved',payout_speed:planSpeed(S.plan)}]
+    };
+    S.latestClaim = S.triggerResult.claims_created[0];
+    go('home');
+    setTimeout(()=>go('alert'), 400);
+  }
+}
+
+async function submitManualClaim() {
+  const btn = document.getElementById('claimsubmit');
+  const amtInput = document.getElementById('claim_amt');
+  const reasonSel = document.getElementById('claim_reason');
+  const amt = parseFloat(amtInput?.value) || Math.round(S.avgDailyEarning * planRate(S.plan));
+  const reason = reasonSel?.value || 'manual claim';
+
+  if(!S.name){ showErr(currentEl,'No worker registered'); return; }
+
+  if(btn){ btn.disabled=true; btn.innerHTML=`<span class="spinner"></span>Verifying triggers…`; }
+
+  try {
+    let triggerData;
+    try {
+      triggerData = await doRunTriggers();
+    } catch(e) {
+      triggerData = S.triggerResult;
+    }
+
+    const firedTriggers = triggerData?.triggers_fired || [];
+
+    const reasonToTrigger = {
+      'Road blocked due to waterlogging': 'waterlogging',
+      'Heavy rain — unable to deliver': 'heavy_rain',
+      'Hazardous AQI — outdoor work restricted': 'aqi_spike',
+      'App outage — no orders received': null,
+      'Strike/curfew — movement restricted': 'strike_curfew',
+      'Cyclonic wind — delivery halted': 'cyclone_wind',
+    };
+
+    const requiredTrigger = reasonToTrigger[reason];
+    const triggerValid = requiredTrigger === null || firedTriggers.includes(requiredTrigger);
+
+    if(!triggerValid) {
+      // Increment false claim counter
+      S.falseClaims = (S.falseClaims || 0) + 1;
+
+
+      S.falseClaims = (S.falseClaims || 0) + 1;
+      const penalty = S.falseClaims >= 3 ? 15 : S.falseClaims === 2 ? 10 : 8;
+      S.cladScore = Math.max(0, S.cladScore - penalty);
+      S.cladGrade = S.cladScore>=80?'A+':S.cladScore>=70?'A':S.cladScore>=60?'B+':S.cladScore>=50?'B':'C';
+
+      // Sync updated score to backend
+      try {
+        await apiPost('/register', {
+          name: S.name,
+          pincode: S.pincode,
+          plan: S.plan,
+          account_age_days: 180,
+          delivery_consistency: 0.88,
+          avg_daily_earning: S.avgDailyEarning,
+          claim_free_weeks: 0,
+          past_claims_count: S.falseClaims + 5,
+          location_honesty: Math.max(0.3, 0.90 - (S.falseClaims * 0.15)),
+          claim_history_score: Math.max(0.3, 0.95 - (S.falseClaims * 0.15)),
+          fraudulent_flags: S.falseClaims,
+        });
+        // Re-fetch premium so backend score updates
+       // Notify backend but don't let it overwrite our penalized score
+        await apiPost('/premium', { name: S.name, month: new Date().getMonth()+1 });
+      } catch(e) {
+        console.warn('Score sync failed:', e);
+      }
+
+      if(btn){ btn.disabled=false; btn.innerHTML=`Submit Claim →`; }
+      go('claimrejected');
+      return;
+    }
+
+    // Trigger is valid — but apply payout penalty if repeat fraudster
+    let finalAmt = amt;
+    let penaltyNote = '';
+    if(S.falseClaims >= 3) {
+      finalAmt = Math.round(amt * 0.5);   // 50% payout
+      penaltyNote = '50% payout — fraud history';
+    } else if(S.falseClaims === 2) {
+      finalAmt = Math.round(amt * 0.7);   // 70% payout
+      penaltyNote = '70% payout — fraud history';
+    } else if(S.falseClaims === 1) {
+      finalAmt = Math.round(amt * 0.85);  // 85% payout
+      penaltyNote = '85% payout — fraud history';
+    }
+    S.payoutPenaltyNote = penaltyNote;
+
+    const data = await doManualClaim(finalAmt, reason);
+    S.latestClaim = data.claim || data;
+    // Override amount shown with penalized amount
+    if(S.latestClaim) S.latestClaim.amount = finalAmt;
+    go('claiming');
+
+  } catch(e) {
+    if(btn){ btn.disabled=false; btn.innerHTML=`Submit Claim →`; }
+    showErr(currentEl, 'Could not verify triggers. Try again.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+go('splash');
+</script>
+</body>
+</html>

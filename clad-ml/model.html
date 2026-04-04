@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clad ML Engine</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0b0b0b;
+      color: white;
+      padding: 30px;
+    }
+    .card {
+      background: #111;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #222;
+    }
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 150px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #00e676;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .green { color: #00e676; }
+    .red { color: #ff5252; }
+  </style>
+</head>
+
+<body>
+
+<h1>🧠 Clad Dynamic Pricing Engine</h1>
+
+<div class="card">
+  <h3>Input</h3>
+  <input id="pincode" placeholder="Pincode" value="560034">
+  <input id="score" placeholder="Clad Score" value="80">
+  <input id="earning" placeholder="Earning" value="700">
+  <input id="month" placeholder="Month" value="7">
+  <br><br>
+  <button onclick="getPremium()">Calculate Premium</button>
+</div>
+
+<div class="card">
+  <h3>Zone Risk</h3>
+  <pre id="zone"></pre>
+</div>
+
+<div class="card">
+  <h3>Breakdown</h3>
+  <pre id="breakdown"></pre>
+</div>
+
+<div class="card">
+  <h3>Final Output</h3>
+  <h2 class="green" id="final">₹--</h2>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+async function getPremium() {
+  const data = {
+    pincode: document.getElementById("pincode").value,
+    account_age_days: 120,
+    clad_score: parseInt(document.getElementById("score").value),
+    delivery_consistency: 0.8,
+    avg_daily_earning: parseInt(document.getElementById("earning").value),
+    claim_free_weeks: 5,
+    past_claims_count: 1,
+    month: parseInt(document.getElementById("month").value)
+  };
+
+  const res = await fetch(`${API}/premium`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  document.getElementById("zone").innerText =
+    JSON.stringify(result.zone_risk, null, 2);
+
+  document.getElementById("breakdown").innerText =
+    result.breakdown.map(b => `${b.factor}: ₹${b.amount}`).join("\n");
+
+  document.getElementById("final").innerText =
+    "₹" + result.predicted_premium;
+}
+</script>
+
+</body>
+</html>

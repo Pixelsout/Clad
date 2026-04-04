@@ -1,0 +1,82 @@
+{
+  "workers": [
+    {
+      "name": "Biswajeet Rout",
+      "pincode": "560034",
+      "plan": "plus",
+      "account_age_days": 180,
+      "delivery_consistency": 0.88,
+      "avg_daily_earning": 720.0,
+      "claim_free_weeks": 8,
+      "past_claims_count": 1,
+      "location_honesty": 0.9,
+      "claim_history_score": 0.95,
+      "fraudulent_flags": 0,
+      "registered_at": "2026-04-04T08:15:20.056709Z",
+      "clad_score": 78.8
+    }
+  ],
+  "policies": [
+    {
+      "id": 1,
+      "user": "Biswajeet Rout",
+      "plan": "plus",
+      "status": "active",
+      "created_at": "2026-04-04T08:15:20.076435Z"
+    }
+  ],
+  "claims": [
+    {
+      "id": 1,
+      "user": "Biswajeet Rout",
+      "amount": 274,
+      "status": "approved",
+      "trigger": "heavy_rain",
+      "reason": "Heavy rain 7.6 intensity for 50min",
+      "created_at": "2026-04-04T08:15:42.455791Z",
+      "payout_speed": "2hr auto"
+    },
+    {
+      "id": 2,
+      "user": "Biswajeet Rout",
+      "amount": 314,
+      "status": "approved",
+      "trigger": "heavy_rain",
+      "reason": "Heavy rain 8.4 intensity for 52min",
+      "created_at": "2026-04-04T08:16:16.354711Z",
+      "payout_speed": "2hr auto"
+    },
+    {
+      "id": 3,
+      "user": "Biswajeet Rout",
+      "amount": 286,
+      "status": "approved",
+      "trigger": "heavy_rain",
+      "reason": "Heavy rain 8.1 intensity for 49min",
+      "created_at": "2026-04-04T08:16:50.433237Z",
+      "payout_speed": "2hr auto"
+    },
+    {
+      "id": 4,
+      "user": "Biswajeet Rout",
+      "amount": 270,
+      "status": "approved",
+      "trigger": "heavy_rain",
+      "reason": "Heavy rain 7.8 intensity for 48min",
+      "created_at": "2026-04-04T08:17:04.630302Z",
+      "payout_speed": "2hr auto"
+    },
+    {
+      "id": 5,
+      "user": "Biswajeet Rout",
+      "amount": 216.0,
+      "reason": "Heavy rain \u2014 unable to deliver",
+      "status": "approved",
+      "payout_speed": "2hr auto",
+      "review_note": "Auto-approved \u2014 CladScore grade A/A+",
+      "clad_score": 78.8,
+      "created_at": "2026-04-04T08:17:04.646522Z",
+      "trigger": "manual"
+    }
+  ]
+}
