@@ -1,224 +1,508 @@
-# Clad  
-## Always covered. No matter what.  
-### AI-Powered Parametric Income Insurance for Q-Commerce Delivery Partners  
-> **Guidewire DEVTrails 2026 · Phase 1 Submission**
+# Clad — Always Covered. No Matter What.
+
+**AI-Powered Parametric Income Insurance for Q-Commerce Delivery Partners**
+Guidewire DEVTrails 2026 · *4AM_Club*
+
+---
+
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![LightGBM](https://img.shields.io/badge/ML-LightGBM-9B59B6?style=flat-square)
+![R2](https://img.shields.io/badge/Model_R%C2%B2-0.97-2ecc71?style=flat-square)
+![MAE](https://img.shields.io/badge/Test_MAE-%E2%82%B92.5-2ecc71?style=flat-square)
+![Railway](https://img.shields.io/badge/Backend-Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)
+![GitHub Pages](https://img.shields.io/badge/Frontend-GitHub_Pages-222?style=flat-square&logo=github&logoColor=white)
+
+---
+
+## Live Demo
+
+| | Link |
+|---|---|
+| **App** | [pixelsout.github.io/Clad](https://pixelsout.github.io/Clad/) |
+| **API** | [clad-production-531d.up.railway.app](https://clad-production-531d.up.railway.app) |
+| **API Docs** | [clad-production-531d.up.railway.app/docs](https://clad-production-531d.up.railway.app/docs) |
+
+---
+
+## Table of Contents
+
+1. [Problem Statement](#1-problem-statement)
+2. [System Workflow](#2-system-workflow)
+3. [Weekly Premium Model](#3-weekly-premium-model)
+4. [Parametric Triggers](#4-parametric-triggers)
+5. [Exclusion Clauses](#5-exclusion-clauses)
+6. [AI / ML Integration](#6-ai--ml-integration)
+7. [Adversarial Defense](#7-adversarial-defense--anti-spoofing)
+8. [Tech Stack](#8-tech-stack)
+9. [What We Built — Phase 2](#9-what-we-built--phase-2)
+10. [API Reference](#10-api-reference)
 
 ---
 
 ## 1. Problem Statement
 
-India's Q-commerce delivery partners earn between ₹600 and ₹900 per day, but they lack a safety net when they cannot work.
+India's Q-commerce delivery partners earn ₹600–₹900 per day with no safety net when they cannot work.
 
-- **The Vulnerability:** During severe rain, extreme heat, poor air quality, floods, or civil unrest, work stops—and so does income.  
-- **The Impact:** Workers miss 6–10 days during monsoon periods, losing up to 30% of their monthly income.  
-- **The Gap:** Traditional insurance covers health or accidents—not lost wages. Claim processing can take up to a week.
+| Threat | Impact | Frequency |
+|--------|--------|-----------|
+| Monsoon rain | Zero deliveries, cannot ride | 6–10 days per month |
+| Extreme heat (>42°C) | Dangerous outdoor conditions | 15+ days in summer |
+| Hazardous AQI (>200) | Health advisory, riding unsafe | 30+ days/year in North India |
+| Bandh or Curfew | Roads blocked, zero movement | Unpredictable |
+| Platform outage | No orders despite availability | Unpredictable |
 
-💡 **Clad solves this.**
+Workers lose up to **30% of monthly income** during monsoon months alone. Traditional insurance covers health or accidents — not lost wages. Manual claim processing takes up to a week.
 
-Clad doesn't employ slow, manual claims. Instead, it uses parametric triggers. When a disturbance goes over a certain level like rainfall >7.5mm/hour or temperature > 45 Celsius, the automated coverage system is triggered and the worker's UPI automatically gets paid. There are no documents to fill out and no waiting.
+**Clad uses parametric triggers.** When a disruption crosses a defined threshold — rainfall above 7.5 mm/hr, AQI above 200 — the system fires automatically and credits the worker's UPI account. No forms, no waiting, no agent calls.
 
-### What sets it apart:
+### Core Differentiators
 
-- **Earning DNA:** Compensation is based on individual earning patterns, not averages.  
-- **3-Layer Triggers:** Covers weather, civic disruptions, and platform outages.  
-- **Pincode Precision:** Triggers are evaluated within a **3 km radius** of a worker’s home zone—not city-wide.  
-  - Example: Rain in Koramangala does not trigger payouts in Whitefield.  
-  - Only affected workers are compensated.
+**Earning DNA** — Payouts are calculated from each worker's individual earning history, not city-wide averages. A worker earning ₹900 on Sunday evenings receives ₹900 as the payout baseline.
+
+**Pincode Precision** — Triggers evaluate within a 3 km radius of the worker's registered zone. Rain in Koramangala does not trigger payouts in Whitefield.
+
+**3-Layer Coverage** — Environmental signals, civic disruptions, and platform outages are all monitored and independently trigger payouts.
 
 ---
 
 ## 2. System Workflow
-```
-ONBOARDING (2 minutes)
-Name → Phone → PAN CARD OTP → Platform → Home zone pincode
-        ↓
-AI builds Earning DNA from 8-week delivery history
-CladScore calculated → Weekly plan assigned
-UPI mandate activated (auto-renews every Monday)
 
-ACTIVE COVERAGE (continuous)
-Real-time monitoring: weather + AQI + civic alerts + platform signals
-        ↓
-Trigger threshold crossed in worker's pincode
-        ↓
-Fraud engine runs (15 signals, under 3 seconds)
-        ↓
-🟢 Green → Auto-payout in 2 hours
-🟡 Yellow → 6-hour hold → auto-approve
-🔴 Red   → 24-hour manual review
-        ↓
-UPI credit. Worker notified instantly.
+### Onboarding
+
+```
+Name + Phone
+     |
+     v
+PAN OTP Verification  ──── Tax history tied to a real individual; cannot be batch-faked
+     |
+     v
+Platform + Home Zone  ──── Pincode locked to 3 km monitoring radius
+     |
+     v
+AI builds Earning DNA ──── From 8-week delivery history (day, hour, zone, season)
+     |
+     v
+CladScore computed    ──── 0–100 trust and risk score
+     |
+     v
+Plan activated        ──── UPI mandate; auto-renews every Monday
+```
+
+### Active Coverage
+
+```
+                  ┌─────────────┐
+                  │  Monitoring │
+                  │  (always on)│
+                  └──────┬──────┘
+                         |
+         ┌───────────────┼───────────────┐
+         |               |               |
+         v               v               v
+   Layer 1            Layer 2         Layer 3
+ Environmental         Civic          Platform
+ Rain / AQI /       Curfew /        Order volume
+ Heat / Flood        Bandh           drop > 60%
+         |               |               |
+         └───────────────┼───────────────┘
+                         |
+                         v
+              Threshold crossed in
+              worker's pincode?
+                        / \
+                      YES   NO
+                       |     |
+                       v     v
+             Fraud engine   Continue
+             15 signals     monitoring
+             < 3 seconds
+                       |
+             ┌─────────┼─────────┐
+             |         |         |
+             v         v         v
+          CLEAN      HOLD      FLAG
+         Grade A+   Grade B   Grade C/D
+         Auto-pay   6hr hold  24hr review
+         in 2hr     then pay  manual check
+                       |
+                       v
+              UPI credited. Worker notified.
 ```
 
 ---
 
 ## 3. Weekly Premium Model
 
-### Earning DNA Engine
-A regression model (scikit-learn) estimates a worker's anticipated pay depending on:
-$$E_{predicted} = f(Day, Hour, Zone, Season, Historical Weather)$$
-This makes sure that payouts are based on real earning potential. For example, a worker who normally makes ₹900 on Sunday nights will get paid that amount.
+### CladScore — Trust and Risk Score (0–100)
 
-###  CladScore (0 to 100)
-CladScore is recalculated every week and uses the following to figure out premiums and payout speed:
-* Dependability (30%)
-* Integrity of location (25%)
-* History of claims (25%)
-* Risk exposure in the zone (20%)
+```
+CladScore = (C1 × 30%) + (C2 × 25%) + (C3 × 25%) + (C4 × 20%)
+```
 
-The formula for payouts is the worker's earnings DNA (for that day) times the disruption rate.
-| Rate of Disruption | Condition |
-| :--- | :--- |
-| **60%** | Heavy rain of more than 7.5 mm/hr for more than 45 minutes |
-| **40%** | Heat index over 42°C from 11 a.m. to 4 p.m. |
-| **50%** | AQI > 300 for more than 3 hours |
-| **80%** | Flood zone alerts |
-| **40%** | Platform down > 60% drop · 90 minutes or more |
-| **70%** | Curfew or civil unrest |
+| Component | Weight | Signals |
+|-----------|:------:|---------|
+| C1 — Delivery Consistency | 30% | Active days, deliveries per day, streak length, platform tenure |
+| C2 — Location Honesty | 25% | GPS consistency, zone adherence, cell tower match, PAN gate |
+| C3 — Claim Integrity | 25% | Approval rate, fraud flags, claim-free streak bonus |
+| C4 — Zone Risk Inverse | 20% | Flood frequency, historical disruption days per year |
 
-* Flood Shield Boost: When there is a flood alarm, the weekly payout limit goes up by 50%. For example, Shield Plus ₹1,500 becomes ₹2,250.
+### Grade to Payout Speed
+
+```
+Score  0 ────── 35 ────── 50 ────── 62 ────── 75 ────── 85 ──── 100
+       |   D   |    C   |    B   |   B+   |    A   |   A+   |
+Speed  | 24hr  |  24hr  |  6hr   |   2hr  |   2hr  | Instant |
+       | review| review |  hold  |  auto  |  auto  |         |
+```
+
+| Grade | Score | Payout Speed | Premium Modifier |
+|-------|:-----:|:------------:|:----------------:|
+| A+    | 85–100 | Instant     | −12%             |
+| A     | 75–84  | 2hr auto    | −8%              |
+| B+    | 62–74  | 2hr auto    | −4%              |
+| B     | 50–61  | 6hr hold    | Base             |
+| C     | 35–49  | 24hr review | +10%             |
+| D     | 0–34   | 24hr review | +20%             |
+
+### ML Premium Breakdown (LightGBM)
+
+```
+Base premium (Plus plan)              ₹49.00
++ Flood risk — zone factor            +₹12.96
++ AQI annual average risk             + ₹2.60
++ Zone disruption frequency           + ₹1.35
++ Monsoon season surcharge            + ₹8.00   (active June–September)
+− CladScore discount (Grade A)        − ₹5.60
+− No-claim streak (8 weeks)           − ₹5.60
+                                      ────────
+Calibrated premium (× 0.7)            ₹43.87 / week
+```
+
+### Plan Tiers
+
+|                     | Clad Basic | Clad Plus           | Clad Pro   |
+|---------------------|:----------:|:-------------------:|:----------:|
+| **Weekly cost**     | ₹29        | ₹49                 | ₹79        |
+| **Weekly cap**      | ₹800       | ₹1,500              | ₹2,500     |
+| **Payout speed**    | 24hr       | 2hr                 | Instant    |
+| **Flood cap boost** | —          | +50% during alerts  | +50%       |
+| **Best for**        | New workers | Most workers       | High earners |
+
 ---
 
 ## 4. Parametric Triggers
-Triggers are evaluated at **pincode level In 3km radius**, not city-wide.
 
-**Layer 1 — Environmental**
-- Rain intensity, heat index, AQI, flood zone alerts via Open-Meteo and AQICN APIs. Thresholds require sustained duration of 45+ min for rain, 3+ hrs for AQI to prevent single-reading false triggers.
+All triggers evaluate at **pincode level within a 3 km radius** — never city-wide.
 
-**Layer 2 — Civic Disruption**
-- Unplanned curfews, bandh, and zone closures detected via government alert APIs and a lightweight NLP scanner monitoring news headlines for disruption keywords matched to pincodes.
+### The 5 Automated Triggers
 
-**Layer 3 — Platform Signal *(unique to Clad)***
-- Simulated Zepto/Blinkit order volume API. If order volume in a zone drops >60% versus the 7-day same-hour average and sustains for 90+ minutes, workers in that zone are triggered. A broken app is not the worker's fault. Clad covers it.
+| # | Trigger | Condition | Payout Rate | Data Source |
+|---|---------|-----------|:-----------:|-------------|
+| 1 | Heavy Rain | Intensity > 7.5 mm/hr AND duration > 45 min | 60% | Open-Meteo |
+| 2 | AQI Spike | AQI > 200 sustained for 3+ hours | 30–50% | AQICN |
+| 3 | Waterlogging | Zone score > 0.65 AND rain > 6 mm/hr | 50% | IMD + zone database |
+| 4 | Cyclone / High Wind | Wind speed > 60 km/h | 50% | Open-Meteo |
+| 5 | Strike / Curfew | Civil alert active for registered pincode | 60–70% | data.gov.in + NLP |
 
----
+### Payout Formula
 
-## 5. AI/ML Integration
+```
+Payout = Worker's Earning DNA (that day/hour) × Disruption Rate
 
-### Earning DNA Engine
-A regression model trained on each worker's 8-week delivery history. 
-Features: day of week, hour, zone, season, past weather correlation. 
-Output: expected earnings for any given day/hour the personal payout baseline.
+Example
+  Worker daily baseline   ₹720
+  Trigger fired           Heavy Rain (60%)
+  Plan                    Clad Plus (2hr payout)
 
-### CladScore Engine
-Weighted multi-factor score recalculated every Sunday. 
-Inputs: delivery consistency, GPS honesty, claim history, zone disruption exposure. Drives plan tier, payout speed, and fraud lane routing.
-This score decides who can get a plan, how quickly they can get their money, and how to route fraud.
+  Payout = ₹720 × 60% = ₹432  →  credited via UPI within 2 hours
+```
 
-### Dynamic Premium Calculation
-Premium adjusts within each tier based on zone historical disruption frequency and CladScore trajectory.
+### Pincode Trigger Map
 
-### Fraud Detection (detailed in Section 8)
-Employs many methodologies, including anomaly detection (Isolation Forest), photo proofs of weather condition, graph-based network, and NLP-driven civic signal verification.
+| Pincode | Zone | Triggers that fire |
+|---------|------|--------------------|
+| 560034 | Koramangala, Bangalore | Heavy Rain, Waterlogging |
+| 560038 | Indiranagar, Bangalore | None (low-risk zone) |
+| 110001 | Central Delhi | AQI Spike, Strike/Curfew |
+| 400001 | Fort, Mumbai | Heavy Rain, Waterlogging, AQI |
 
-### Support Chatbot
-Claude API-powered assistant handles worker queries in plain language policy details, claim status, payout timelines. Available 24/7 in-app.
+### 3-Layer Trigger Architecture
 
----
+```
+┌─────────────────────────────────────────────────────┐
+│  Layer 1 — Environmental                            │
+│  Signals  : Rain intensity, heat index, AQI, floods │
+│  APIs     : Open-Meteo, AQICN, Tomorrow.io          │
+│  Threshold: 45+ min sustained rain / 3+ hr AQI      │
+└─────────────────────────────────────────────────────┘
 
-## 6. Adversarial Defense & Anti-Spoofing Strategy.
+┌─────────────────────────────────────────────────────┐
+│  Layer 2 — Civic Disruption                         │
+│  Signals  : Curfew orders, bandh, zone closures     │
+│  APIs     : data.gov.in + NLP headline scanner      │
+│  Logic    : Disruption keywords matched to pincodes │
+└─────────────────────────────────────────────────────┘
 
-> *"You can spoof your GPS. You cannot spoof a photo, your footsteps, the sound of rain outside your window, or the referral chain that brought you here."*
-
-### The Threat
-A coordinated ring of 500 accounts uses free GPS-spoofing apps to fake locations inside a disruption zone. They wait for real rain, then simultaneously file claims. Simple GPS verification sees nothing wrong. Result: ₹2,10,000 drained in one event.
-
-Clad's defense runs **15 independent signals across 3 layers**. Defeating one layer does not help.
-
----
-
-### 1. The Differentiation
-*How we tell a genuinely stranded worker from a GPS spoofer*
-- **Passive Environmental Check** At claim time, the app silently samples for 3 seconds. Ambient light sensor + on-device audio classifier confirm whether the environment is consistent with being indoors during rain. A fraudster in a dry office fails silently. Zero friction for honest users.
-
-- **Delivery History Verification** — A real worker has 8+ weeks of delivery timestamps, earnings, zone activity, and order logs. A fake account created to game the system has none of this. Clad requires a minimum activity threshold before any claim is eligible real gig history cannot be faked across 500 accounts simultaneously. No history = no payout eligibility, regardless of other signals.
-
-- **GPS Variance Analysis** — a spoofed GPS holds a perfectly static coordinate. A real phone shows natural jitter of 3–8 meters due to satellite drift. A coordinate stable within ±0.5m for 40+ minutes is a physical impossibility on real hardware.
----
-
-### 2. The Data
-*What we analyze beyond GPS to catch a coordinated ring*
-
-- **PAN Verification at Onboarding** Unlike Aadhaar which can be forged or bought, PAN has a real tax filing history tied to a living individual. Clad mandates PAN verification during onboarding. A fraud ring cannot batch-create 500 PANs with genuine income histories. This closes the door before any fraud attempt begins.
-
-- **Claim Timestamp Clustering** Real workers file over a 90–120-minute rolling window. A fraud ring scripts all 500 claims within 3–5 minutes. Burst of 50+ claims from the same pin code in 5 minutes → entire batch held for review.
-
-- **Account Creation Spike Detection** Fake accounts are batch-registered 1–2 weeks before the attack. Rolling 14-day registration rate per pin code.  spike above baseline, entire surge cohort enters probation, 24hr review required.
-
-- **Shared Onboarding Metadata** Fraud rings use the same tools. Clustering on device model, OS version, app version, and registration IP subnet exposes accounts created in the same batch environment.
-
-- **Social Graph Isolation** Real workers overlap in delivery zones, pickup locations, and order pools. Fraudulent accounts are isolated with zero connections to the genuine worker ecosystem. Graph analysis detects accounts that exist in a vacuum.
+┌─────────────────────────────────────────────────────┐
+│  Layer 3 — Platform Signal  (unique to Clad)        │
+│  Signals  : Zepto / Blinkit order volume            │
+│  Condition: Drop > 60% vs. 7-day same-hour average  │
+│             sustained for 90+ minutes               │
+│  Rationale: A broken app is not the worker's fault  │
+└─────────────────────────────────────────────────────┘
+```
 
 ---
 
-### 3. The UX Balance
-*Protecting honest workers caught in the net*
+## 5. Exclusion Clauses
 
-Claims flow into one of three lanes — never a binary block:
-
-| Lane | When | Action | Worker Message |
-|---|---|---|---|
-| 🟢 Green | CladScore > 70, account > 60 days, all signals clean | Auto-payout in 2 hours | *"Claim approved. ₹X on its way."* |
-| 🟡 Yellow | 1–2 inconclusive signals, medium CladScore | 6hr hold → auto-approve | *"Validating payout by [time]. You're covered."* |
-| 🔴 Red | Hard anomaly, new account, device mismatch | 24hr manual review | *"Security check in progress. Your claim is safe."* |
-
-**Honest Worker Protection:**
-- False positives never count against CladScore. A Clad Shield note is added instead
-- Approved-after-review claims earn CladScore +2 points (trust confirmed)
-- Genuine network drops in bad weather get 20% signal tolerance adjustment across all Layer 1 checks
-- If 40+ nearby workers have clean signals during the same event, degraded-signal workers route to yellow (not red) as real disruptions affect everyone, and honest workers are protected by their neighbours' clean data
+| # | Exclusion | Rationale |
+|---|-----------|-----------|
+| 1 | War or armed conflict | Systemic and uninsurable |
+| 2 | WHO-declared pandemics or epidemics | Systemic and uninsurable |
+| 3 | Nationwide government-mandated lockdowns | Systemic, government action |
+| 4 | Terrorism or nuclear events | Force majeure |
+| 5 | Disruptions caused or staged by the worker | Moral hazard |
+| 6 | Platform deactivation due to policy violations | Worker's responsibility |
+| 7 | Events below minimum duration thresholds | Data integrity |
+| 8 | Events outside the worker's registered zone | Outside monitoring scope |
+| 9 | Claims filed more than 6 hours after disruption | Data integrity |
+| 10 | Weeks where the policy is paused | Policy inactive |
 
 ---
 
-## 7. Platform Justification
+## 6. AI / ML Integration
 
-**Choice: Mobile-first Progressive Web App (PWA) for workers + Web dashboard for operations**
+### ML Pipeline
 
-* **Choice:** Progressive Web App (PWA) for workers and a web dashboard for operations.
-* **Device Profile:** Most workers use Android phones (₹6,000–₹12,000) and are reluctant to install new apps.
-* **PWA Benefits:** Works in browser, easy install, offline use, no Play Store dependency, and perfect UPI integration.
-* **Timeline:** PWA takes ~6 weeks; native apps take 10+ weeks.
+```
+Worker profile + zone data
+         |
+         v
+┌────────────────────────────┐
+│      CladScore Engine      │
+│  C1 Consistency   (30%)    │
+│  C2 Location      (25%)    │
+│  C3 Claim history (25%)    │
+│  C4 Zone risk     (20%)    │
+│                            │
+│  Output: 0–100, grade,     │
+│  payout speed, modifier    │
+└────────────┬───────────────┘
+             |
+             v
+┌────────────────────────────┐
+│  LightGBM Premium Model    │
+│  16 features               │
+│  8,000 training samples    │
+│  Test R²  = 0.97           │
+│  Test MAE = ₹2.5           │
+│  Calibration × 0.7         │
+│                            │
+│  Output: ₹20–₹120 / week  │
+└────────────┬───────────────┘
+             |
+             v
+┌────────────────────────────┐
+│  Explainability Breakdown  │
+│  Every rupee adjustment    │
+│  shown to the worker       │
+│  Flood / AQI / Monsoon /   │
+│  CladScore / Streak        │
+└────────────────────────────┘
+```
+
+### Model Card
+
+| Property | Value |
+|----------|-------|
+| Algorithm | LightGBM Regressor |
+| Training samples | 8,000 (synthetic + IMD-sourced zone data) |
+| Features | 16 |
+| Target | `optimal_premium` — ₹20 to ₹120 per week |
+| Test R² | **0.97** |
+| Test MAE | **₹2.50** |
+| Calibration factor | 0.7 (conservative underwriting) |
+| Fallback | Actuarial formula when model file is absent |
+
+### Feature Importance (Top 8)
+
+```
+expected_weekly_payout       ████████████████████
+weekly_disruption_prob       ████████████████
+flood_frequency              █████████████
+avg_daily_earning            ████████████
+clad_score                   ██████████
+waterlogging_score           ████████
+is_monsoon                   ███████
+disruption_days_per_year     ██████
+```
+
+---
+
+## 7. Adversarial Defense & Anti-Spoofing
+
+> "You can spoof your GPS. You cannot spoof your tax history, your delivery timestamps, or the sound of rain outside your window."
+
+### The Threat Model
+
+```
+Coordinated attack scenario:
+  500 accounts use GPS-spoofing apps to fake location inside a disruption zone.
+  They wait for real rain, then simultaneously file claims.
+  Simple GPS verification sees nothing unusual.
+  Result: ₹2,10,000 drained in one weather event.
+
+Clad's response: 15 independent signals across 3 layers.
+Defeating one layer does not help the attacker.
+```
+
+### Layer 1 — Passive Environmental Checks
+
+| Signal | What it catches | Friction for honest workers |
+|--------|-----------------|-----------------------------|
+| Ambient light sensor | Fraudster in a dry office fails silently | None — passive sampling |
+| On-device audio classifier | Silence vs. rain ambience | None — runs in background |
+| GPS jitter analysis | Spoofed GPS holds static ±0.0 m. Real hardware drifts ±3–8 m naturally | None |
+
+### Layer 2 — Data Signals
+
+| Signal | Detection Logic |
+|--------|----------------|
+| PAN verification | PAN carries real tax filing history. A fraud ring cannot batch-create 500 genuine PANs. |
+| Delivery history gate | 8+ weeks of real delivery timestamps required before claim eligibility. |
+| Claim timestamp clustering | Real workers file over 90–120 min. A scripted ring fires 500 claims in 3–5 min → batch held. |
+| Account creation spike | Rolling 14-day registration rate per pincode. Surge cohort enters 24hr review probation. |
+| Shared onboarding metadata | Same device model + OS version + IP subnet = batch-registered accounts → flagged. |
+| Social graph isolation | Fake accounts have zero connections to the genuine worker ecosystem. |
+
+### Layer 3 — Zone Consensus
+
+```
+If 40 or more nearby workers have clean signals during the same event:
+  → Degraded-signal workers route to Yellow lane (not Red)
+
+Real disruptions affect everyone in the zone simultaneously.
+Honest workers are protected by their neighbours' clean data.
+```
+
+### Fraud Lane Routing
+
+| Lane | Condition | Action | Worker message |
+|------|-----------|--------|----------------|
+| Green | CladScore ≥ 75, account > 60 days, all signals clean | Auto-payout in 2 hours | "Claim approved. ₹X on its way." |
+| Yellow | 1–2 inconclusive signals, mid-range CladScore | 6hr hold → auto-approve | "Validating by [time]. You're covered." |
+| Red | Hard anomaly, new account, device mismatch | 24hr manual review | "Security check in progress. Your claim is safe." |
+
+### Honest Worker Protections
+
+- False positives never count against CladScore. A Shield note is added instead.
+- Claims approved after manual review earn CladScore +2 points (trust confirmed).
+- Genuine network degradation during bad weather triggers a 20% signal tolerance adjustment across all Layer 1 checks.
 
 ---
 
 ## 8. Tech Stack
 
 | Layer | Technology |
-|---|---|
+|-------|------------|
 | Worker App | React PWA + Tailwind CSS |
 | Ops Dashboard | React + Recharts |
 | Backend API | FastAPI (Python) |
 | Database | PostgreSQL + Redis |
-| Async Jobs | Celery (payout processing, trigger monitoring) |
-| ML / AI | scikit-learn · networkx · TensorFlow Lite · Claude API |
-| Weather | Open-Meteo (free) · AQICN (free) · Tomorrow.io (free tier) |
-| Civic Alerts | data.gov.in · News NLP scanner |
-| Platform Signal | Custom JSON mock server (simulates Zepto order volumes) |
+| Async Jobs | Celery — payout processing, trigger monitoring |
+| ML / AI | LightGBM, scikit-learn, networkx, Claude API |
+| Weather Data | Open-Meteo, AQICN, Tomorrow.io |
+| Civic Alerts | data.gov.in, NLP news headline scanner |
+| Platform Signal | Custom JSON mock simulating Zepto/Blinkit order volumes |
 | Payments | Razorpay sandbox (UPI mock) |
-| Hosting | Vercel (frontend) + Railway (backend) |
+| Frontend Hosting | GitHub Pages |
+| Backend Hosting | Railway |
 
 ---
 
-## 9. Development Plan
+## 9. What We Built — Phase 2
 
-| Week | Focus | Key Deliverables |
-|---|---|---|
-| 1 | Foundation | Data models, Earning DNA schema, mock API server |
-| 2 | Onboarding + Policy | KYC flow, CladScore engine, weekly plan activation |
-| 3 | Trigger Engine | 3-layer stack, pin code mesh, real-time monitoring |
-| 4 | Claims + Payout | Fraud engine, lane routing, UPI mock payout |
-| 5 | Dashboard | Analytics, CladScore visualisation, premium calculator |
-| 6 | Polish | Demo script, stress testing, pitch deck |
+Phase 2 theme: **"Protect Your Worker"** (March 21 – April 4)
+
+### Deliverable Status
+
+| Deliverable | Status | Details |
+|-------------|:------:|---------|
+| Registration Process | Complete | Worker profile with zone, plan, earning data |
+| Insurance Policy Management | Complete | Basic / Plus / Pro plan activation |
+| Dynamic ML Premium Calculation | Complete | LightGBM inference + CladScore + line-item breakdown |
+| Claims Management | Complete | 5 auto-triggers + zero-touch manual claim flow |
+| 5 Automated Triggers | Complete | Rain, AQI, Waterlogging, Wind, Curfew |
+| Frontend | Complete | Fully connected to all backend endpoints |
+| AI Integration | Complete | LightGBM R²=0.97, 4-component CladScore, explainability output |
+
+### Project Structure
+
+```
+clad/
+├── index.html                      Frontend (single file, deployed on GitHub Pages)
+├── app.py                          FastAPI — all 13 API routes
+├── train_model.py                  LightGBM training script
+│
+├── core/
+│   └── db.py                       In-memory store with JSON persistence
+│
+├── services/
+│   ├── pricing_engine.py           ML pipeline: CladScore → LightGBM → breakdown
+│   ├── pricing_service.py          Payout formula for trigger-created claims
+│   ├── real_trigger_service.py     5 automated disruption triggers
+│   └── claim_service.py            Manual claim creation and auto-approval routing
+│
+├── src/
+│   └── predict.py                  LightGBM inference (lazy-loaded)
+│
+├── data/
+│   ├── zone_risk.py                4-city zone risk profiles (IMD-sourced)
+│   ├── clad_score.py               CladScore sub-model (4 components)
+│   └── training_data.csv           8,000 training samples
+│
+└── models/
+    ├── premium_model.pkl           Trained LightGBM model
+    ├── scaler.pkl                  StandardScaler
+    └── model_card.json             R², MAE, feature importance metadata
+```
+
+---
+
+## 10. API Reference
+
+Base URL: `https://clad-production-531d.up.railway.app`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check with live counts |
+| POST | `/register` | Register a gig worker |
+| POST | `/policy/create` | Create or update an insurance policy |
+| GET | `/policy` | List all policies |
+| GET | `/policy/{name}` | Get one worker's policy |
+| POST | `/premium` | ML-powered dynamic premium calculation |
+| GET | `/trigger/check?pincode=` | Run all 5 disruption triggers |
+| GET | `/claims` | List all claims |
+| GET | `/claims/{user}` | Claims for one worker |
+| POST | `/claims/create` | Zero-touch manual claim submission |
+| GET | `/worker/{name}` | Full worker profile |
+| GET | `/workers` | List all registered workers |
+| POST | `/admin/reset?confirm=yes` | Reset database |
+| GET | `/docs` | Interactive Swagger UI |
+
+Full interactive documentation available at [clad-production-531d.up.railway.app/docs](https://clad-production-531d.up.railway.app/docs).
 
 ---
 
 ## Conclusion
 
-Clad is not a feature extension of existing insurance, it is a fundamentally different product built for how gig workers live and earn. Weekly pricing matches their pay cycle. Earning DNA makes payouts personal and fair. Three trigger layers cover threats no competitor addresses. And a 15-signal fraud defense protects the pool without punishing honest workers.
+Clad is not a feature extension of existing insurance — it is a fundamentally different product built for how gig workers live and earn. Weekly pricing matches their pay cycle. Earning DNA makes payouts personal and fair. Three trigger layers cover threats no competitor addresses. A 15-signal fraud defense protects the insurance pool without punishing honest workers.
 
-The result: a delivery partner opens the app after a rain-soaked morning off, and ₹420 is already waiting. No claim filed. No agent called. Just covered.
+The result: a delivery partner opens the app after a rain-soaked morning off, and ₹432 is already waiting. No claim filed. No agent called. Just covered.
 
 ---
 
-*Clad: Always covered. No matter what.*
+*Clad — Always covered. No matter what.*
 **4AM_Club · Guidewire DEVTrails 2026**
