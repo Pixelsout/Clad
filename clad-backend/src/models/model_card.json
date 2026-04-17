@@ -1,0 +1,59 @@
+{
+  "model": "LightGBMRegressor",
+  "version": "1.0.0",
+  "trained_at": "2026-04-04T04:33:25.593986Z",
+  "training_rows": 6400,
+  "test_rows": 1600,
+  "train_r2": 0.9456,
+  "test_r2": 0.9615,
+  "test_mae_inr": 0.03,
+  "features": [
+    "base_premium",
+    "account_age_days",
+    "clad_score",
+    "delivery_consistency",
+    "avg_daily_earning",
+    "claim_free_weeks",
+    "past_claims_count",
+    "is_monsoon",
+    "is_aqi_season",
+    "flood_frequency",
+    "avg_rainfall_mm",
+    "aqi_annual_avg",
+    "waterlogging_score",
+    "disruption_days_per_year",
+    "weekly_disruption_prob",
+    "expected_weekly_payout"
+  ],
+  "target": "optimal_premium",
+  "feature_importance": {
+    "avg_daily_earning": 1496,
+    "expected_weekly_payout": 1040,
+    "claim_free_weeks": 306,
+    "delivery_consistency": 238,
+    "weekly_disruption_prob": 225,
+    "account_age_days": 202,
+    "aqi_annual_avg": 198,
+    "flood_frequency": 147,
+    "clad_score": 138,
+    "is_aqi_season": 84,
+    "avg_rainfall_mm": 44,
+    "disruption_days_per_year": 35,
+    "past_claims_count": 29,
+    "is_monsoon": 15,
+    "waterlogging_score": 3,
+    "base_premium": 0
+  },
+  "hyperparameters": {
+    "n_estimators": 400,
+    "learning_rate": 0.03,
+    "max_depth": 6,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8
+  },
+  "calibration_factor": 0.7,
+  "premium_bounds_inr": {
+    "min": 20,
+    "max": 120
+  }
+}

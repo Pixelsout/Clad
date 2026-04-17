@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+lightgbm
+fastapi
+uvicorn
+joblib
+httpx
+python-dotenv
+networkx
+pydantic

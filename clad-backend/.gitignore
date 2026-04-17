@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pkl
+.env
+db_state.json
+*.csv
+*.log
+venv/
+.venv/
+.idea/
+node_modules/
+dist/
+build/
+.DS_Store
+*.sqlite3
