@@ -5,7 +5,7 @@
 # 🛡 Clad
 ### AI-Powered Parametric Income Insurance for Gig Delivery Workers
 
-**[🚀 Live App](https://clad-frontend-six.vercel.app) · [⚡ API](https://clad-production-531d.up.railway.app) · [📖 API Docs](https://clad-production-531d.up.railway.app/docs)**
+**[🚀 Live App](https://clad-frontend-six.vercel.app)**
 
 <br/>
 
