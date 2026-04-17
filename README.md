@@ -39,6 +39,11 @@
 |---|---|---|
 | 🌐 **Frontend App** | [clad-frontend-six.vercel.app](https://clad-frontend-six.vercel.app) | ![Live](https://img.shields.io/badge/status-live-22C55E?style=flat-square) |
 
+## 📊 Pitch Deck
+
+| | Link |
+|---|---|
+| 📑 **Pitch Deck (PDF)** | [View on Google Drive](https://drive.google.com/file/d/1o2BD7xN3iwY-1bLCTZNB5x4Bo6FC6PsE/view?usp=sharing) |
 
 ---
 
