@@ -19,7 +19,7 @@ Guidewire DEVTrails 2026 · *4AM_Club*
 
 | | Link |
 |---|---|
-| **App** | [pixelsout.github.io/Clad](https://pixelsout.github.io/Clad/) |
+| **App** | [pixelsout.github.io/Clad](https://clad-frontend-six.vercel.app/  ) |
 | **API** | [clad-production-531d.up.railway.app](https://clad-production-531d.up.railway.app) |
 | **API Docs** | [clad-production-531d.up.railway.app/docs](https://clad-production-531d.up.railway.app/docs) |
 
